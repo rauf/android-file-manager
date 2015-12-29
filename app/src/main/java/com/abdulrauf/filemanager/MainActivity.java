@@ -1,5 +1,7 @@
 package com.abdulrauf.filemanager;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -7,19 +9,43 @@ import android.view.MenuItem;
 
 import com.abdulrauf.filemanager.fragments.DisplayFragment;
 
-public class MainActivity extends AppCompatActivity {
+import java.io.File;
 
+public class MainActivity extends AppCompatActivity implements DisplayFragment.FragmentChange{
 
     DisplayFragment displayFragment;
+    FragmentManager fm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        displayFragment = new DisplayFragment();
-        getFragmentManager().beginTransaction().add(R.id.RelativeLayoutMain, displayFragment).commit();
+        fm = getFragmentManager();
 
+        displayFragment = new DisplayFragment();
+        fm.beginTransaction()
+                .add(R.id.RelativeLayoutMain, displayFragment)
+                .commit();
+    }
+
+    @Override
+    public void onDirectoryClicked(File path) {
+
+        DisplayFragment displayFragment = new DisplayFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("path",path.getAbsolutePath());
+        displayFragment.setArguments(bundle);
+
+        fm.beginTransaction()
+                .addToBackStack("prev")
+                .replace(R.id.RelativeLayoutMain,displayFragment)
+                .commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        fm.popBackStackImmediate();
     }
 
     @Override

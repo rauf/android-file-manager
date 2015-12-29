@@ -4,9 +4,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.abdulrauf.filemanager.R;
@@ -21,7 +19,7 @@ import java.io.File;
 public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragmentAdapter.ListItemViewHolder>{
 
 
-    public interface OnItemClickListener{
+    public interface OnItemClickListener  {
         public void onItemClick(View view, int position);
     }
 
@@ -59,7 +57,6 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
 
     }
 
-
     @Override
     public int getItemCount() {
             return filesAndFolders.length;
@@ -76,4 +73,5 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
             title = (TextView) itemView.findViewById(R.id.title);
         }
     }
+
 }
