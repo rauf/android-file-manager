@@ -4,46 +4,65 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.abdulrauf.filemanager.R;
 
-import java.util.ArrayList;
+import java.io.File;
 
 
 /**
  * Created by abdul on 29/12/15.
  */
+
 public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragmentAdapter.ListItemViewHolder>{
 
 
-    ArrayList<DisplayFragmentListItem> listItems;
+    public interface OnItemClickListener{
+        public void onItemClick(View view, int position);
+    }
 
-    public DisplayFragmentAdapter(ArrayList<DisplayFragmentListItem> listItems) {
-        this.listItems = listItems;
+    private File[] filesAndFolders;
+    private OnItemClickListener onItemClickListener;
+
+    public DisplayFragmentAdapter(File[] filesAndFolders, OnItemClickListener onItemClickListener) {
+        this.filesAndFolders = filesAndFolders;
+        this.onItemClickListener = onItemClickListener;
     }
 
     @Override
     public ListItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                                        .inflate(R.layout.list_item_fragment_display,parent,false);
+        View view = LayoutInflater
+                .from(parent.getContext())
+                .inflate(R.layout.list_item_fragment_display, parent, false);
 
         return new ListItemViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ListItemViewHolder holder, int position) {
+    public void onBindViewHolder(ListItemViewHolder holder, final int position) {
 
-        DisplayFragmentListItem singleItem = listItems.get(position);
+        final File singleItem = filesAndFolders[position];
 
-        holder.title.setText(singleItem.getTitle());
-        holder.cardView.setCardBackgroundColor(3566);
+        holder.title.setText(singleItem.getName());
+        holder.cardView.setCardBackgroundColor(783566);
+
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onItemClickListener.onItemClick(v, position);
+            }
+        });
+
     }
+
 
     @Override
     public int getItemCount() {
-        return listItems.size();
+            return filesAndFolders.length;
     }
 
     static class ListItemViewHolder extends RecyclerView.ViewHolder {
@@ -53,11 +72,8 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
 
         public ListItemViewHolder(View itemView) {
             super(itemView);
-
             cardView = (CardView) itemView.findViewById(R.id.cardView);
             title = (TextView) itemView.findViewById(R.id.title);
-
         }
     }
-
 }
