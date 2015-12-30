@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.abdulrauf.filemanager.R;
@@ -21,6 +22,7 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
 
     public interface OnItemClickListener  {
         public void onItemClick(View view, int position);
+        public void onItemLongClick(View view,int position);
     }
 
     private File[] filesAndFolders;
@@ -52,6 +54,14 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
             @Override
             public void onClick(View v) {
                 onItemClickListener.onItemClick(v, position);
+            }
+        });
+
+        holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                onItemClickListener.onItemLongClick(v, position);
+                return true;
             }
         });
 

@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">"File Manager "</string>
     <string name="action_settings">Settings</string>
+    <string name="dialog.onlongpress.delete">Delete</string>
+    <string name="dialog.onlongpress.rename">Rename</string>
+    <string name="dialog.onlongpress.copy">Copy</string>
+    <string name="dialog.onlongpress.move">Move</string>
+    <string name="dialog.onlongpress.open">Open</string>
+    <string name="dialog.onlongpress.share">Share</string>
 </resources>

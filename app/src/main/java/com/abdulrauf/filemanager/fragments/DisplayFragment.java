@@ -15,13 +15,16 @@ import android.widget.Toast;
 import com.abdulrauf.filemanager.MainActivity;
 import com.abdulrauf.filemanager.R;
 import com.abdulrauf.filemanager.adapters.DisplayFragmentAdapter;
+import com.abdulrauf.filemanager.dialogs.OnLongPressDialog;
 
 import java.io.File;
 
 /**
  * Created by abdul on 29/12/15.
  */
-public class DisplayFragment extends Fragment{
+public class DisplayFragment extends Fragment implements
+        DisplayFragmentAdapter.OnItemClickListener,
+        OnLongPressDialog.OnLongPressListener {
 
     public interface FragmentChange {
         public void onDirectoryClicked(File path);
@@ -31,7 +34,7 @@ public class DisplayFragment extends Fragment{
     String externalStorage;
     File path;
     FragmentChange fragmentChange;
-
+    File[] filesAndFolders;
 
     @Override
     public void onAttach(Context context) {
@@ -65,37 +68,70 @@ public class DisplayFragment extends Fragment{
 
 
         //externalStorage = Environment.getExternalStorageDirectory().toString();
-
-        final File[] filesAndFolders =  path.listFiles();
+        filesAndFolders =  path.listFiles();
 
         Toast.makeText(getContext(),"new fragment",Toast.LENGTH_LONG).show();
 
-        DisplayFragmentAdapter displayFragmentAdapter =
-                new DisplayFragmentAdapter(filesAndFolders, new DisplayFragmentAdapter.OnItemClickListener() {
-
-                    @Override
-                    public void onItemClick(View view, int position) {
-
-                        File singleItem = filesAndFolders[position];
-
-                        if(singleItem.isFile()) {
-                            Toast.makeText(getContext(), "Target is a file", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        if(!singleItem.canRead()) {
-                            Toast.makeText(getContext(), "Do not have read access", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        fragmentChange.onDirectoryClicked(singleItem);
-                    }
-                });
-
-
+        DisplayFragmentAdapter displayFragmentAdapter = new DisplayFragmentAdapter(filesAndFolders, this);
         recyclerView.setLayoutManager(gridLayoutManager);
         recyclerView.setAdapter(displayFragmentAdapter);
 
         return view;
     }
 
+
+    @Override
+    public void onItemClick(View view, int position) {
+
+        File singleItem = filesAndFolders[position];
+
+        if(singleItem.isFile()) {
+            Toast.makeText(getContext(), "Target is a file", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(!singleItem.canRead()) {
+            Toast.makeText(getContext(), "Do not have read access", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        fragmentChange.onDirectoryClicked(singleItem);
+    }
+
+
+
+    @Override
+    public void onItemLongClick(View view, int position) {
+            new OnLongPressDialog(this,position).show(getFragmentManager(),"onLongPressDialog");
+    }
+
+
+    @Override
+    public void onOpenButtonClicked(int position) {
+        Toast.makeText(getContext(),"open Button clicked",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onShareButtonClicked(int position) {
+        Toast.makeText(getContext(),"share Button clicked",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDeleteButtonClicked(int position) {
+        Toast.makeText(getContext(),"delete Button clicked",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRenameButtonClicked(int position) {
+        Toast.makeText(getContext(),"rename Button clicked",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onCopyButtonClicked(int position) {
+        Toast.makeText(getContext(),"copy Button clicked",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onMoveButtonClicked(int position) {
+        Toast.makeText(getContext(),"move Button clicked",Toast.LENGTH_SHORT).show();
+    }
 }
