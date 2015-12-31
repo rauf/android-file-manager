@@ -1,7 +1,6 @@
 package com.abdulrauf.filemanager.fragments;
 
 import android.app.Fragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
@@ -12,10 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.abdulrauf.filemanager.MainActivity;
 import com.abdulrauf.filemanager.R;
 import com.abdulrauf.filemanager.adapters.DisplayFragmentAdapter;
 import com.abdulrauf.filemanager.dialogs.OnLongPressDialog;
+import com.abdulrauf.filemanager.managers.FileManager;
 
 import java.io.File;
 
@@ -26,21 +25,12 @@ public class DisplayFragment extends Fragment implements
         DisplayFragmentAdapter.OnItemClickListener,
         OnLongPressDialog.OnLongPressListener {
 
-    public interface FragmentChange {
-        public void onDirectoryClicked(File path);
-    }
-
     RecyclerView recyclerView;
     String externalStorage;
     File path;
-    FragmentChange fragmentChange;
     File[] filesAndFolders;
+    FileManager fileManager;
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        fragmentChange = (MainActivity)context;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,7 +41,7 @@ public class DisplayFragment extends Fragment implements
         try {
             temp = getArguments().getString("path");
         }catch (Exception e) {
-            Toast.makeText(getContext(),"Error",Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(),"Exception",Toast.LENGTH_LONG).show();
         } finally {
             path = new File(temp);
         }
@@ -66,11 +56,10 @@ public class DisplayFragment extends Fragment implements
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),2);
         gridLayoutManager.setOrientation(GridLayoutManager.VERTICAL);
 
-
         //externalStorage = Environment.getExternalStorageDirectory().toString();
         filesAndFolders =  path.listFiles();
 
-        Toast.makeText(getContext(),"new fragment",Toast.LENGTH_LONG).show();
+        fileManager = new FileManager(getContext());
 
         DisplayFragmentAdapter displayFragmentAdapter = new DisplayFragmentAdapter(filesAndFolders, this);
         recyclerView.setLayoutManager(gridLayoutManager);
@@ -82,21 +71,9 @@ public class DisplayFragment extends Fragment implements
 
     @Override
     public void onItemClick(View view, int position) {
-
         File singleItem = filesAndFolders[position];
-
-        if(singleItem.isFile()) {
-            Toast.makeText(getContext(), "Target is a file", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if(!singleItem.canRead()) {
-            Toast.makeText(getContext(), "Do not have read access", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        fragmentChange.onDirectoryClicked(singleItem);
+        fileManager.open(singleItem);
     }
-
 
 
     @Override
@@ -134,4 +111,6 @@ public class DisplayFragment extends Fragment implements
     public void onMoveButtonClicked(int position) {
         Toast.makeText(getContext(),"move Button clicked",Toast.LENGTH_SHORT).show();
     }
+
+
 }

@@ -64,7 +64,6 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
                 return true;
             }
         });
-
     }
 
     @Override

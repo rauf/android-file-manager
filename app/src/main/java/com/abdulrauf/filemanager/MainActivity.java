@@ -1,6 +1,5 @@
 package com.abdulrauf.filemanager;
 
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,9 +8,8 @@ import android.view.MenuItem;
 
 import com.abdulrauf.filemanager.fragments.DisplayFragment;
 
-import java.io.File;
 
-public class MainActivity extends AppCompatActivity implements DisplayFragment.FragmentChange{
+public class MainActivity extends AppCompatActivity{
 
     DisplayFragment displayFragment;
     FragmentManager fm;
@@ -29,22 +27,13 @@ public class MainActivity extends AppCompatActivity implements DisplayFragment.F
                 .commit();
     }
 
-    @Override
-    public void onDirectoryClicked(File path) {
-
-        DisplayFragment displayFragment = new DisplayFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("path",path.getAbsolutePath());
-        displayFragment.setArguments(bundle);
-
-        fm.beginTransaction()
-                .addToBackStack("prev")
-                .replace(R.id.RelativeLayoutMain,displayFragment)
-                .commit();
-    }
 
     @Override
     public void onBackPressed() {
+
+        if(fm.getBackStackEntryCount() <= 0 )
+            super.onBackPressed();
+
         fm.popBackStackImmediate();
     }
 
