@@ -1,16 +1,19 @@
 package com.abdulrauf.filemanager.adapters;
 
+import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.abdulrauf.filemanager.R;
 
 import java.io.File;
+import java.util.ArrayList;
 
 
 /**
@@ -23,12 +26,13 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
     public interface OnItemClickListener  {
         public void onItemClick(View view, int position);
         public void onItemLongClick(View view,int position);
+        public void onIconClick(View view,int position);
     }
 
-    private File[] filesAndFolders;
+    private ArrayList<File> filesAndFolders;
     private OnItemClickListener onItemClickListener;
 
-    public DisplayFragmentAdapter(File[] filesAndFolders, OnItemClickListener onItemClickListener) {
+    public DisplayFragmentAdapter(ArrayList<File> filesAndFolders, OnItemClickListener onItemClickListener) {
         this.filesAndFolders = filesAndFolders;
         this.onItemClickListener = onItemClickListener;
     }
@@ -43,12 +47,11 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
     }
 
     @Override
-    public void onBindViewHolder(ListItemViewHolder holder, final int position) {
+    public void onBindViewHolder(final ListItemViewHolder holder, final int position) {
 
-        final File singleItem = filesAndFolders[position];
+        final File singleItem = filesAndFolders.get(position);
 
         holder.title.setText(singleItem.getName());
-        holder.cardView.setCardBackgroundColor(783566);
 
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,22 +67,33 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
                 return true;
             }
         });
+
+        holder.icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                holder.cardView.setCardBackgroundColor(Color.parseColor("#6666ff"));
+                onItemClickListener.onIconClick(holder.cardView,position);
+            }
+        });
+
     }
 
     @Override
     public int getItemCount() {
-            return filesAndFolders.length;
+            return filesAndFolders.size();
     }
 
     static class ListItemViewHolder extends RecyclerView.ViewHolder {
 
         CardView cardView;
         TextView title;
+        ImageView icon;
 
         public ListItemViewHolder(View itemView) {
             super(itemView);
             cardView = (CardView) itemView.findViewById(R.id.cardView);
             title = (TextView) itemView.findViewById(R.id.title);
+            icon = (ImageView) itemView.findViewById(R.id.icon);
         }
     }
 
