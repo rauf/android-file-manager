@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/linearLayout"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:weightSum="1">
+    android:weightSum="1"
+    android:focusable="true"
+    android:clickable="true"
+    >
 
     <android.support.v7.widget.CardView
         android:id="@+id/cardView"
@@ -16,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="2dp"
-            >
+           >
 
             <ImageView
                 android:id="@+id/icon"

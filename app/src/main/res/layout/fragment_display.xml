@@ -8,6 +8,9 @@
         android:id="@+id/recyclerView"
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
+        android:focusable="true"
+        android:clickable="true"
+        android:focusableInTouchMode="true"
         >
 
     </android.support.v7.widget.RecyclerView>

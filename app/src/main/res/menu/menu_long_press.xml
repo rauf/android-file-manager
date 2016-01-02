@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/shareButton1"
+        android:title="@string/dialog.onlongpress.share"
+        android:visible="true"
+        app:showAsAction="never"
+        />
+
+    <item android:id="@+id/deleteButton1"
+        android:title="@string/dialog.onlongpress.delete"
+        android:visible="true"
+        app:showAsAction="never"
+        />
+
+    <item android:id="@+id/moveButton1"
+        android:title="@string/dialog.onlongpress.move"
+        android:visible="true"
+        app:showAsAction="never"
+        />
+
+    <item android:id="@+id/copyButton1"
+        android:title="@string/dialog.onlongpress.copy"
+        android:visible="true"
+        app:showAsAction="never"
+        />
+
+</menu>
