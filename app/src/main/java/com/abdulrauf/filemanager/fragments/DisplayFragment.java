@@ -144,7 +144,7 @@ public class DisplayFragment extends Fragment implements
                     Toast.makeText(getContext(), "Move Button CLicked", Toast.LENGTH_SHORT).show();
                     mode.finish();
                     return true;
-                
+
                 case R.id.copyButton1 :
                     Toast.makeText(getContext(), "Copy Button CLicked", Toast.LENGTH_SHORT).show();
                     mode.finish();

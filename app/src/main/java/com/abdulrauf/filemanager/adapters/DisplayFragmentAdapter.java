@@ -106,13 +106,13 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
         }
     }
 
-    public void markSelected(int position) {
+    public void select(int position) {
 
         selectedItems.put(position, true);
         notifyItemChanged(position);
     }
 
-    public void unmarkSelected(int position) {
+    public void unselect(int position) {
 
         if(selectedItems.get(position,false)) {
             selectedItems.delete(position);
