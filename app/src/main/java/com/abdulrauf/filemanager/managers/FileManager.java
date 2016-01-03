@@ -14,6 +14,8 @@ import com.abdulrauf.filemanager.R;
 import com.abdulrauf.filemanager.fragments.DisplayFragment;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by abdul on 31/12/15.
@@ -89,6 +91,24 @@ public class FileManager {
         }
     }
 
+
+    public void delete(ArrayList<File> files){
+
+        for (int i = 0; i < files.size() ; i++) {
+
+            File file = files.get(i);
+
+            if (file.exists() && file.isFile() ) {
+                file.delete();
+            }
+            else if (file.exists() && file.isDirectory() ) {
+
+                ArrayList<File> files1 = new ArrayList<>(Arrays.asList(file.listFiles()));
+                delete(files1);
+                file.delete();
+            }
+        }
+    }
 
 
 }

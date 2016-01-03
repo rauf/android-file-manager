@@ -1,8 +1,13 @@
 package com.abdulrauf.filemanager.fragments;
 
+import android.Manifest;
 import android.app.Fragment;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.ActionMode;
@@ -39,12 +44,18 @@ public class DisplayFragment extends Fragment implements
     DisplayFragmentAdapter adapter;
     ActionMode actionMode;
     Toolbar toolbar;
+    String temp;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String temp = "/";
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED)
+
+             temp = "/";
+
+        else temp = Environment.getExternalStorageDirectory().toString();
 
         try {
             temp = getArguments().getString("path");
@@ -53,7 +64,9 @@ public class DisplayFragment extends Fragment implements
         } finally {
             path = new File(temp);
         }
+
     }
+
 
     @Nullable
     @Override
@@ -61,7 +74,7 @@ public class DisplayFragment extends Fragment implements
         View view = inflater.inflate(R.layout.fragment_display,container,false);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),2);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(),2);
         gridLayoutManager.setOrientation(GridLayoutManager.VERTICAL);
 
         toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
@@ -69,7 +82,7 @@ public class DisplayFragment extends Fragment implements
 
         //externalStorage = Environment.getExternalStorageDirectory().toString();
         filesAndFolders = new ArrayList<>(Arrays.asList(path.listFiles()));
-        fileManager = new FileManager(getContext());
+        fileManager = new FileManager(getActivity());
 
         adapter = new DisplayFragmentAdapter(filesAndFolders, this);
         recyclerView.setLayoutManager(gridLayoutManager);
@@ -116,7 +129,7 @@ public class DisplayFragment extends Fragment implements
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater menuInflater = mode.getMenuInflater();
-            menuInflater.inflate(R.menu.menu_long_press, menu);
+            menuInflater.inflate(R.menu.menu_action_mode, menu);
             return true;
         }
 
@@ -131,22 +144,24 @@ public class DisplayFragment extends Fragment implements
             switch (item.getItemId()) {
 
                 case R.id.shareButton1 :
-                    Toast.makeText(getContext(), "Share Button CLicked", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Share Button CLicked", Toast.LENGTH_SHORT).show();
                     mode.finish();
                     return true;
 
                 case R.id.deleteButton1 :
-                    Toast.makeText(getContext(), "Delete Button CLicked", Toast.LENGTH_SHORT).show();
+                    fileManager.delete(adapter.getSelectedItems());
+                    adapter.notifyItemRangeChanged(0,adapter.getItemCount());
+                    Toast.makeText(getActivity(), "Delete Button CLicked", Toast.LENGTH_SHORT).show();
                     mode.finish();
                     return true;
 
                 case R.id.moveButton1 :
-                    Toast.makeText(getContext(), "Move Button CLicked", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Move Button CLicked", Toast.LENGTH_SHORT).show();
                     mode.finish();
                     return true;
 
                 case R.id.copyButton1 :
-                    Toast.makeText(getContext(), "Copy Button CLicked", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Copy Button CLicked", Toast.LENGTH_SHORT).show();
                     mode.finish();
                     return true;
 
