@@ -8,6 +8,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by abdul on 31/12/15.
@@ -100,6 +104,7 @@ public class FileManager {
         return file.renameTo(newFile);
     }
 
+
     public boolean moveToDirectory(File old,File newDir){
 
         if(!old.exists() || !newDir.exists())
@@ -107,5 +112,50 @@ public class FileManager {
 
         return old.renameTo(new File(newDir,old.getName()));
     }
+
+
+    public ArrayList<File> sortAscending (ArrayList<File> files, boolean caseSensitive) {
+
+        if (caseSensitive) {
+            Collections.sort(files, new Comparator<File>() {
+                @Override
+                public int compare(File lhs, File rhs) {
+                    return lhs.getName().compareTo(rhs.getName());
+                }
+            });
+
+        } else {
+            Collections.sort(files, new Comparator<File>() {
+                @Override
+                public int compare(File lhs, File rhs) {
+                    return lhs.getName().compareToIgnoreCase(rhs.getName());
+                }
+            });
+        }
+    return files;
+    }
+
+
+    public ArrayList<File> sortDescending (ArrayList<File> files, boolean caseSensitive) {
+
+        if (caseSensitive) {
+            Collections.sort(files, new Comparator<File>() {
+                @Override
+                public int compare(File lhs, File rhs) {
+                    return rhs.getName().compareTo(lhs.getName());
+                }
+            });
+
+        } else {
+            Collections.sort(files, new Comparator<File>() {
+                @Override
+                public int compare(File lhs, File rhs) {
+                    return rhs.getName().compareToIgnoreCase(lhs.getName());
+                }
+            });
+        }
+        return files;
+    }
+
 
 }

@@ -19,15 +19,39 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+
 /**
  * Created by abdul on 5/1/16.
  */
 public class EventManager {
 
+    public enum OPERATION {
+         DELETE(1),COPY(2) ,MOVE(3);
 
-    private final int DELETE = 1;
-    private final int COPY = 2;
-    private final int MOVE = 3;
+        private int val;
+
+        OPERATION(int val){
+            this.val = val;
+        }
+
+        public int getValue(){
+            return val;
+        }
+    }
+
+    public enum SORT{
+        ASC(1),DESC(2);
+
+        private int val;
+
+        SORT(int val) {
+            this.val = val;
+        }
+
+        public int getValue(){
+            return val;
+        }
+    }
 
     Context context;
     FragmentManager fm;
@@ -38,6 +62,8 @@ public class EventManager {
         this.fm = ((MainActivity) context).getFragmentManager();
         fileManager = new FileManager();
     }
+
+
 
     public void open(File file) {
 
@@ -74,7 +100,6 @@ public class EventManager {
                     .addToBackStack("prev")
                     .replace(R.id.RelativeLayoutMain,displayFragment)
                     .commit();
-            return;
         }
     }
 
@@ -82,7 +107,7 @@ public class EventManager {
 
     public void copy(ArrayList<File> source, File destination){
 
-        new BackgroundWork(COPY,source,destination)
+        new BackgroundWork(OPERATION.COPY,source,destination)
                 .execute();
 
     }
@@ -100,11 +125,28 @@ public class EventManager {
     
     public void move(ArrayList<File> sources,File destination) {
 
-        new BackgroundWork(MOVE,sources,destination)
+        new BackgroundWork(OPERATION.MOVE,sources,destination)
                 .execute();
 
     }
 
+    public ArrayList<File> sort(SORT type,ArrayList<File> files, boolean caseSensitive) {
+
+        ArrayList<File> sortedFiles = new ArrayList<>();
+
+        switch (type) {
+
+            case ASC :
+                sortedFiles = fileManager.sortAscending(files,caseSensitive);
+                break;
+
+            case DESC:
+                sortedFiles = fileManager.sortDescending(files,caseSensitive);
+                break;
+        }
+
+        return sortedFiles;
+    }
 
 
 
@@ -112,12 +154,12 @@ public class EventManager {
 
     private class BackgroundWork extends AsyncTask< Void, Integer, Boolean> {
 
-        int operation;
+        OPERATION operation;
         private ProgressDialog progressDialog;
         ArrayList<File> sources;
         File destination;
 
-        public BackgroundWork(int operation, ArrayList<File> sources, File destination) {
+        public BackgroundWork(OPERATION operation, ArrayList<File> sources, File destination) {
             this.operation = operation;
             this.sources = sources;
             this.destination = destination;

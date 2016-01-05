@@ -28,10 +28,13 @@ import com.abdulrauf.filemanager.adapters.DisplayFragmentAdapter;
 import com.abdulrauf.filemanager.dialogs.OnLongPressDialog;
 import com.abdulrauf.filemanager.managers.EventManager;
 import com.abdulrauf.filemanager.managers.FileManager;
+import com.abdulrauf.filemanager.managers.EventManager.SORT;
+
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+
 
 /**
  * Created by abdul on 29/12/15.
@@ -50,7 +53,6 @@ public class DisplayFragment extends Fragment implements
     private Toolbar toolbar;
     private String temp;
     private EventManager eventManager;
-    private String input;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,7 +93,9 @@ public class DisplayFragment extends Fragment implements
         fileManager = new FileManager();
         eventManager = new EventManager(getActivity());
 
-        adapter = new DisplayFragmentAdapter(filesAndFolders, this);
+        adapter = new DisplayFragmentAdapter(
+                eventManager.sort(SORT.ASC ,filesAndFolders, false),
+                        this);
         recyclerView.setLayoutManager(gridLayoutManager);
         recyclerView.setAdapter(adapter);
 
@@ -151,25 +155,25 @@ public class DisplayFragment extends Fragment implements
             switch (item.getItemId()) {
 
                 case R.id.shareButton1 :
-                    Toast.makeText(getActivity(), "Share Button CLicked", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Share Button Clicked", Toast.LENGTH_SHORT).show();
                     mode.finish();
                     return true;
 
                 case R.id.deleteButton1 :
                     //fileManager.delete(adapter.getSelectedItems());
                     adapter.notifyItemRangeChanged(0,adapter.getItemCount());
-                    Toast.makeText(getActivity(), "Delete Button CLicked", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Delete Button Clicked", Toast.LENGTH_SHORT).show();
                     mode.finish();
                     return true;
 
                 case R.id.moveButton1 :
-                    Toast.makeText(getActivity(), "Move Button CLicked", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Move Button Clicked", Toast.LENGTH_SHORT).show();
                     eventManager.move(adapter.getSelectedItems(),new File("/sdcard/"));
                     mode.finish();
                     return true;
 
                 case R.id.copyButton1 :
-                    Toast.makeText(getActivity(), "Copy Button CLicked", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Copy Button Clicked", Toast.LENGTH_SHORT).show();
                     eventManager.copy(adapter.getSelectedItems(), new File("/sdcard/"));
                     Toast.makeText(getActivity(), "Copy Finished", Toast.LENGTH_SHORT).show();
                     mode.finish();
