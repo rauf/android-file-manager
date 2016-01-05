@@ -1,21 +1,13 @@
 package com.abdulrauf.filemanager.managers;
 
-import android.app.FragmentManager;
-import android.content.ActivityNotFoundException;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.webkit.MimeTypeMap;
-import android.widget.Toast;
 
-import com.abdulrauf.filemanager.MainActivity;
-import com.abdulrauf.filemanager.R;
-import com.abdulrauf.filemanager.fragments.DisplayFragment;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Created by abdul on 31/12/15.
@@ -23,53 +15,7 @@ import java.util.Arrays;
 
 public class FileManager {
 
-    Context context;
-    FragmentManager fm;
 
-    public FileManager(Context context) {
-        this.context = context;
-        this.fm = ((MainActivity) context).getFragmentManager();
-    }
-
-    public void open(File file) {
-
-        if(!file.canRead()) {
-            Toast.makeText(context, "Do not have read access", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if(file.isFile()) {
-
-            MimeTypeMap mime = MimeTypeMap.getSingleton();
-            Intent i = new Intent();
-            i.setAction(Intent.ACTION_VIEW);
-            String mimeType = mime.getMimeTypeFromExtension(getExtension(file.getAbsolutePath()).substring(1));
-            i.setDataAndType(Uri.fromFile(file), mimeType);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-            try {
-                context.startActivity(i);
-            } catch (ActivityNotFoundException e) {
-                Toast.makeText(context, "No handler for this type of file.", Toast.LENGTH_LONG).show();
-            }
-
-            return;
-        }
-
-        if(file.isDirectory()) {
-
-            DisplayFragment displayFragment = new DisplayFragment();
-            Bundle bundle = new Bundle();
-            bundle.putString("path",file.getAbsolutePath());
-            displayFragment.setArguments(bundle);
-
-            fm.beginTransaction()
-                    .addToBackStack("prev")
-                    .replace(R.id.RelativeLayoutMain,displayFragment)
-                    .commit();
-            return;
-        }
-    }
 
     public String getExtension(String url) {
 
@@ -89,6 +35,56 @@ public class FileManager {
             }
             return ext.toLowerCase();
         }
+    }
+
+
+    public boolean copyToDirectory(File old, File newDir) throws IOException {
+
+
+        int temp;
+        File copiedFile = new File(newDir + "/" + old.getName());
+
+        if( !old.exists() || !newDir.exists())
+            return false;
+
+        if( old.isFile() && old.canRead() && newDir.isDirectory() && newDir.canWrite()) {
+
+            BufferedInputStream in = null;
+            BufferedOutputStream out = null;
+
+            try {
+
+                in = new BufferedInputStream(new FileInputStream(old));
+                out = new BufferedOutputStream(new FileOutputStream(copiedFile));
+
+                while ( (temp = in.read()) != -1) {
+                    out.write(temp);
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if(in != null)
+                    in.close();
+                if(out != null)
+                    out.close();
+            }
+        }
+
+        else if (old.isDirectory() && old.canRead() && newDir.isDirectory() && newDir.canExecute()) {
+
+            File[] files = old.listFiles();
+
+            if(!copiedFile.mkdirs())
+                return false;
+
+            for (File singleFile : files) {
+                System.out.println(singleFile + "     copiedFile is " + copiedFile);
+                copyToDirectory(singleFile, copiedFile);
+            }
+        }
+
+        return true;
     }
 
 

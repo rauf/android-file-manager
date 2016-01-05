@@ -23,6 +23,7 @@ import android.support.v7.widget.Toolbar;
 import com.abdulrauf.filemanager.R;
 import com.abdulrauf.filemanager.adapters.DisplayFragmentAdapter;
 import com.abdulrauf.filemanager.dialogs.OnLongPressDialog;
+import com.abdulrauf.filemanager.managers.EventManager;
 import com.abdulrauf.filemanager.managers.FileManager;
 
 import java.io.File;
@@ -45,6 +46,7 @@ public class DisplayFragment extends Fragment implements
     ActionMode actionMode;
     Toolbar toolbar;
     String temp;
+    EventManager eventManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -82,7 +84,8 @@ public class DisplayFragment extends Fragment implements
 
         //externalStorage = Environment.getExternalStorageDirectory().toString();
         filesAndFolders = new ArrayList<>(Arrays.asList(path.listFiles()));
-        fileManager = new FileManager(getActivity());
+        fileManager = new FileManager();
+        eventManager = new EventManager(getActivity());
 
         adapter = new DisplayFragmentAdapter(filesAndFolders, this);
         recyclerView.setLayoutManager(gridLayoutManager);
@@ -94,7 +97,7 @@ public class DisplayFragment extends Fragment implements
     @Override
     public void onItemClick(View view, int position) {
         File singleItem = filesAndFolders.get(position);
-        fileManager.open(singleItem);
+        eventManager.open(singleItem);
     }
 
 
@@ -162,6 +165,8 @@ public class DisplayFragment extends Fragment implements
 
                 case R.id.copyButton1 :
                     Toast.makeText(getActivity(), "Copy Button CLicked", Toast.LENGTH_SHORT).show();
+                    eventManager.copy(adapter.getSelectedItems(), new File("/sdcard/"));
+                    Toast.makeText(getActivity(), "Copy Finished", Toast.LENGTH_SHORT).show();
                     mode.finish();
                     return true;
 
