@@ -1,7 +1,9 @@
 package com.abdulrauf.filemanager;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -9,7 +11,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.abdulrauf.filemanager.fragments.DisplayFragment;
 
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity{
                 .commit();
 
     }
-    
+
 
     private void requestForPermission() {
 
@@ -44,7 +45,15 @@ public class MainActivity extends AppCompatActivity{
             if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 
-                Toast.makeText(MainActivity.this, "To access the SD card, you must grant the permission", Toast.LENGTH_SHORT).show();
+                 promptForPermissionsDialog("You need to give access to External Storage", new DialogInterface.OnClickListener() {
+                     @Override
+                     public void onClick(DialogInterface dialog, int which) {
+                         ActivityCompat.requestPermissions(MainActivity.this,
+                                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                 100);
+                     }
+                 });
+
             } else {
 
                 ActivityCompat.requestPermissions(MainActivity.this,
@@ -52,6 +61,17 @@ public class MainActivity extends AppCompatActivity{
                         100);
             }
         }
+    }
+
+    private void promptForPermissionsDialog(String message, DialogInterface.OnClickListener onClickListener ) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+        builder.setMessage(message)
+                .setPositiveButton("OK", onClickListener )
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
 
     }
 

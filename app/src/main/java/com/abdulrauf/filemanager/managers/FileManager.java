@@ -92,23 +92,6 @@ public class FileManager {
     }
 
 
-    public void delete(ArrayList<File> files){
-
-        for (int i = 0; i < files.size() ; i++) {
-
-            File file = files.get(i);
-
-            if (file.exists() && file.isFile() ) {
-                file.delete();
-            }
-            else if (file.exists() && file.isDirectory() ) {
-
-                ArrayList<File> files1 = new ArrayList<>(Arrays.asList(file.listFiles()));
-                delete(files1);
-                file.delete();
-            }
-        }
-    }
 
 
 }

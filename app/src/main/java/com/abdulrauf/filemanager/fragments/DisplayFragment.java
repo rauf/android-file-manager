@@ -60,7 +60,7 @@ public class DisplayFragment extends Fragment implements
         try {
             temp = getArguments().getString("path");
         }catch (Exception e) {
-            Toast.makeText(getActivity(),"Exception",Toast.LENGTH_LONG).show();
+            //ignore exception
         } finally {
             path = new File(temp);
         }
@@ -149,7 +149,7 @@ public class DisplayFragment extends Fragment implements
                     return true;
 
                 case R.id.deleteButton1 :
-                    fileManager.delete(adapter.getSelectedItems());
+                    //fileManager.delete(adapter.getSelectedItems());
                     adapter.notifyItemRangeChanged(0,adapter.getItemCount());
                     Toast.makeText(getActivity(), "Delete Button CLicked", Toast.LENGTH_SHORT).show();
                     mode.finish();
