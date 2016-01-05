@@ -15,6 +15,7 @@ import com.abdulrauf.filemanager.R;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 
 
 /**
@@ -55,6 +56,7 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
         final File singleItem = filesAndFolders.get(position);
 
         holder.title.setText(singleItem.getName());
+        holder.lastModified.setText( new Date(singleItem.lastModified()).toString());
 
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,6 +96,7 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
 
         CardView cardView;
         TextView title;
+        TextView lastModified;
         ImageView icon;
         LinearLayout linearLayout;
 
@@ -103,6 +106,7 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
             title = (TextView) itemView.findViewById(R.id.title);
             icon = (ImageView) itemView.findViewById(R.id.icon);
             linearLayout = (LinearLayout) itemView.findViewById(R.id.linearLayout);
+            lastModified = (TextView) itemView.findViewById(R.id.lastModified);
         }
     }
 

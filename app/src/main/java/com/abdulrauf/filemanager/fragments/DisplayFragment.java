@@ -1,7 +1,9 @@
 package com.abdulrauf.filemanager.fragments;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -17,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 import android.support.v7.widget.Toolbar;
 
@@ -37,16 +40,17 @@ public class DisplayFragment extends Fragment implements
         DisplayFragmentAdapter.OnItemClickListener,
         OnLongPressDialog.OnLongPressListener{
 
-    RecyclerView recyclerView;
-    String externalStorage;
-    File path;
-    ArrayList<File> filesAndFolders;
-    FileManager fileManager;
-    DisplayFragmentAdapter adapter;
-    ActionMode actionMode;
-    Toolbar toolbar;
-    String temp;
-    EventManager eventManager;
+    private RecyclerView recyclerView;
+    private String externalStorage;
+    private File path;
+    private ArrayList<File> filesAndFolders;
+    private FileManager fileManager;
+    private DisplayFragmentAdapter adapter;
+    private ActionMode actionMode;
+    private Toolbar toolbar;
+    private String temp;
+    private EventManager eventManager;
+    private String input;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -160,6 +164,7 @@ public class DisplayFragment extends Fragment implements
 
                 case R.id.moveButton1 :
                     Toast.makeText(getActivity(), "Move Button CLicked", Toast.LENGTH_SHORT).show();
+                    eventManager.move(adapter.getSelectedItems(),new File("/sdcard/"));
                     mode.finish();
                     return true;
 
@@ -204,6 +209,7 @@ public class DisplayFragment extends Fragment implements
     @Override
     public void onRenameButtonClicked(int position) {
         Toast.makeText(getActivity(),"rename Button clicked",Toast.LENGTH_SHORT).show();
+        promptUserForRenameInput(filesAndFolders.get(position));
     }
 
     @Override
@@ -214,6 +220,29 @@ public class DisplayFragment extends Fragment implements
     @Override
     public void onMoveButtonClicked(int position) {
         Toast.makeText(getActivity(),"move Button clicked",Toast.LENGTH_SHORT).show();
+    }
+
+
+
+    private void promptUserForRenameInput(final File file) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        final EditText editText = new EditText(getActivity());
+        editText.setText(file.getName());
+
+        builder.setMessage("Type the new name ")
+                .setView(editText)
+                .setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        eventManager.rename(file,
+                                editText.getText().toString());
+                    }
+                })
+                .setNegativeButton("Cancel",null)
+                .create()
+                .show();
     }
 
 }

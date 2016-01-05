@@ -87,6 +87,25 @@ public class FileManager {
     }
 
 
+    public boolean renameFileTo(File file,String newName) {
 
+        if(!file.exists() || !file.canRead())
+            return false;
+
+        File newFile = new File(file.getParent() ,newName);
+
+        if(newFile.exists())
+            return false;
+
+        return file.renameTo(newFile);
+    }
+
+    public boolean moveToDirectory(File old,File newDir){
+
+        if(!old.exists() || !newDir.exists())
+            return false;
+
+        return old.renameTo(new File(newDir,old.getName()));
+    }
 
 }

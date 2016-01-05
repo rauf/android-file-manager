@@ -61,10 +61,9 @@ public class EventManager {
                 Toast.makeText(context, "No handler for this type of file.", Toast.LENGTH_LONG).show();
             }
 
-            return;
         }
 
-        if(file.isDirectory()) {
+        else if(file.isDirectory()) {
 
             DisplayFragment displayFragment = new DisplayFragment();
             Bundle bundle = new Bundle();
@@ -88,13 +87,30 @@ public class EventManager {
 
     }
 
+    public void rename(File file,String name) {
+
+        if(fileManager.renameFileTo(file,name))
+            Toast.makeText(context,"Rename successful",Toast.LENGTH_SHORT).show();
+
+        else Toast.makeText(context,"Cannot rename",Toast.LENGTH_SHORT).show();
+
+    }
+
+
+    
+    public void move(ArrayList<File> sources,File destination) {
+
+        new BackgroundWork(MOVE,sources,destination)
+                .execute();
+
+    }
+
 
 
 
 
 
     private class BackgroundWork extends AsyncTask< Void, Integer, Boolean> {
-
 
         int operation;
         private ProgressDialog progressDialog;
@@ -119,7 +135,14 @@ public class EventManager {
                     progressDialog.setTitle("Copying...");
                     progressDialog.setMessage("Files are being copied");
                     progressDialog.show();
+                    break;
 
+
+                case MOVE:
+                    progressDialog.setTitle("Moving...");
+                    progressDialog.setMessage("Files are being moves");
+                    progressDialog.show();
+                    break;
             }
         }
 
@@ -132,7 +155,6 @@ public class EventManager {
                 case COPY:
 
                     for (File source : sources) {
-
                         try {
                             fileManager.copyToDirectory(source,destination);
 
@@ -141,8 +163,18 @@ public class EventManager {
                             return false;
                         }
                     }
+                    break;
 
-
+                case MOVE:
+                    for(File source: sources) {
+                        try{
+                            fileManager.moveToDirectory(source,destination);
+                        } catch (Exception e){
+                            e.printStackTrace();
+                            return false;
+                        }
+                    }
+                    break;
 
             }
 
