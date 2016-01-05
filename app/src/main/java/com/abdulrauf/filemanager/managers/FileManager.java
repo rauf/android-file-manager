@@ -79,7 +79,6 @@ public class FileManager {
                 return false;
 
             for (File singleFile : files) {
-                System.out.println(singleFile + "     copiedFile is " + copiedFile);
                 copyToDirectory(singleFile, copiedFile);
             }
         }
