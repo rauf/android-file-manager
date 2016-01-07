@@ -3,12 +3,12 @@ package com.abdulrauf.filemanager.fragments;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,37 +27,32 @@ import com.abdulrauf.filemanager.R;
 import com.abdulrauf.filemanager.adapters.DisplayFragmentAdapter;
 import com.abdulrauf.filemanager.dialogs.OnLongPressDialog;
 import com.abdulrauf.filemanager.managers.EventManager;
-import com.abdulrauf.filemanager.managers.FileManager;
-import com.abdulrauf.filemanager.managers.EventManager.SORT;
 
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 
 /**
  * Created by abdul on 29/12/15.
  */
-public class DisplayFragment extends Fragment implements
-        DisplayFragmentAdapter.OnItemClickListener,
-        OnLongPressDialog.OnLongPressListener{
+public class DisplayFragment extends Fragment  {
+
 
     private RecyclerView recyclerView;
-    private String externalStorage;
     private File path;
     private ArrayList<File> filesAndFolders;
-    private FileManager fileManager;
+    private Toolbar toolbar;
+    private EventManager eventManager;
     private DisplayFragmentAdapter adapter;
     private ActionMode actionMode;
-    private Toolbar toolbar;
-    private String temp;
-    private EventManager eventManager;
 
-    @Override
+
+      @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        String temp;
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED)
 
@@ -65,13 +60,7 @@ public class DisplayFragment extends Fragment implements
 
         else temp = Environment.getExternalStorageDirectory().toString();
 
-        try {
-            temp = getArguments().getString("path");
-        }catch (Exception e) {
-            //ignore exception
-        } finally {
-            path = new File(temp);
-        }
+        path = new File(temp);
 
     }
 
@@ -88,51 +77,55 @@ public class DisplayFragment extends Fragment implements
         toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         toolbar.setTitle(path.getName());
 
-        //externalStorage = Environment.getExternalStorageDirectory().toString();
-        filesAndFolders = new ArrayList<>(Arrays.asList(path.listFiles()));
-        fileManager = new FileManager();
-        eventManager = new EventManager(getActivity());
+        filesAndFolders = new ArrayList<>();
 
-        adapter = new DisplayFragmentAdapter(
-                eventManager.sort(SORT.ASC ,filesAndFolders, false),
-                        this);
+        adapter = new DisplayFragmentAdapter(filesAndFolders,onItemClickListenerCallback);
+        eventManager = new EventManager(getActivity(),filesAndFolders,adapter);
+
         recyclerView.setLayoutManager(gridLayoutManager);
+        eventManager.open(path);
         recyclerView.setAdapter(adapter);
 
         return view;
     }
 
-    @Override
-    public void onItemClick(View view, int position) {
-        File singleItem = filesAndFolders.get(position);
-        eventManager.open(singleItem);
-    }
 
 
-    @Override
-    public void onItemLongClick(View view, int position) {
-            new OnLongPressDialog(this,position).show(getFragmentManager(), "onLongPressDialog");
-    }
 
+    private DisplayFragmentAdapter.OnItemClickListener onItemClickListenerCallback = new DisplayFragmentAdapter.OnItemClickListener() {
 
-    @Override
-    public void onIconClick(View view, int position) {
+        @Override
+        public void onItemClick(View view, int position) {
+            File singleItem = filesAndFolders.get(position);
+            eventManager.open(singleItem);
 
-        if(actionMode != null) {
-
-            adapter.toggleSelection(position);
-            actionMode.setTitle(adapter.getSelectedItemsCount() + " items selected");
-
-            if ( adapter.getSelectedItemsCount() <= 0 )
-                actionMode.finish();
-
-            return;
         }
 
-        actionMode = getActivity().startActionMode(actionModeCallback);
-        adapter.toggleSelection(position);
-        actionMode.setTitle(adapter.getSelectedItemsCount() + " items selected");
-    }
+        @Override
+        public void onItemLongClick(View view, int position) {
+            new OnLongPressDialog(onLongPressListenerCallback, position).show(getFragmentManager(), "onLongPressDialog");
+        }
+
+        @Override
+        public void onIconClick(View view, int position) {
+
+            if (actionMode != null) {
+
+                adapter.toggleSelection(position);
+                actionMode.setTitle(adapter.getSelectedItemsCount() + " items selected");
+
+                if (adapter.getSelectedItemsCount() <= 0)
+                    actionMode.finish();
+
+                return;
+            }
+
+            actionMode = getActivity().startActionMode(actionModeCallback);
+            adapter.toggleSelection(position);
+            actionMode.setTitle(adapter.getSelectedItemsCount() + " items selected");
+        }
+    };
+
 
 
     private ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
@@ -193,40 +186,40 @@ public class DisplayFragment extends Fragment implements
     };
 
 
+    private OnLongPressDialog.OnLongPressListener  onLongPressListenerCallback = new  OnLongPressDialog.OnLongPressListener() {
 
+        @Override
+        public void onOpenButtonClicked(int position) {
+            Toast.makeText(getActivity(), "open Button clicked", Toast.LENGTH_SHORT).show();
+        }
 
-    @Override
-    public void onOpenButtonClicked(int position) {
-        Toast.makeText(getActivity(),"open Button clicked",Toast.LENGTH_SHORT).show();
-    }
+        @Override
+        public void onShareButtonClicked(int position) {
+            Toast.makeText(getActivity(), "share Button clicked", Toast.LENGTH_SHORT).show();
+        }
 
-    @Override
-    public void onShareButtonClicked(int position) {
-        Toast.makeText(getActivity(),"share Button clicked",Toast.LENGTH_SHORT).show();
-    }
+        @Override
+        public void onDeleteButtonClicked(int position) {
+            Toast.makeText(getActivity(), "delete Button clicked", Toast.LENGTH_SHORT).show();
+        }
 
-    @Override
-    public void onDeleteButtonClicked(int position) {
-        Toast.makeText(getActivity(),"delete Button clicked",Toast.LENGTH_SHORT).show();
-    }
+        @Override
+        public void onRenameButtonClicked(int position) {
+            Toast.makeText(getActivity(), "rename Button clicked", Toast.LENGTH_SHORT).show();
+            promptUserForRenameInput(filesAndFolders.get(position));
+        }
 
-    @Override
-    public void onRenameButtonClicked(int position) {
-        Toast.makeText(getActivity(),"rename Button clicked",Toast.LENGTH_SHORT).show();
-        promptUserForRenameInput(filesAndFolders.get(position));
-    }
+        @Override
+        public void onCopyButtonClicked(int position) {
+            Toast.makeText(getActivity(), "copy Button clicked", Toast.LENGTH_SHORT).show();
+        }
 
-    @Override
-    public void onCopyButtonClicked(int position) {
-        Toast.makeText(getActivity(),"copy Button clicked",Toast.LENGTH_SHORT).show();
-    }
+        @Override
+        public void onMoveButtonClicked(int position) {
+            Toast.makeText(getActivity(), "move Button clicked", Toast.LENGTH_SHORT).show();
+        }
 
-    @Override
-    public void onMoveButtonClicked(int position) {
-        Toast.makeText(getActivity(),"move Button clicked",Toast.LENGTH_SHORT).show();
-    }
-
-
+    };
 
     private void promptUserForRenameInput(final File file) {
 
@@ -249,4 +242,12 @@ public class DisplayFragment extends Fragment implements
                 .show();
     }
 
+
+    public Toolbar getToolbar() {
+        return toolbar;
+    }
+
+    public EventManager getEventManager() {
+        return eventManager;
+    }
 }

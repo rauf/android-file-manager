@@ -15,7 +15,8 @@ import android.view.MenuItem;
 import com.abdulrauf.filemanager.fragments.DisplayFragment;
 
 
-public class MainActivity extends AppCompatActivity{
+
+public class MainActivity extends AppCompatActivity {
 
     DisplayFragment displayFragment;
     FragmentManager fm;
@@ -26,12 +27,13 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
 
         requestForPermission();
-
         fm = getFragmentManager();
 
         displayFragment = new DisplayFragment();
+
         fm.beginTransaction()
                 .add(R.id.RelativeLayoutMain, displayFragment)
+                .addToBackStack("displayFragment")
                 .commit();
 
     }
@@ -78,11 +80,21 @@ public class MainActivity extends AppCompatActivity{
     @Override
     public void onBackPressed() {
 
-        if(fm.getBackStackEntryCount() <= 0 )
+        int count = displayFragment
+                .getEventManager()
+                .getFileManager()
+                .getPathStackItemsCount();
+
+        if( count == 1)
             super.onBackPressed();
 
-        fm.popBackStackImmediate();
+        else displayFragment
+                .getEventManager()
+                .moveUpDirectory();
+
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

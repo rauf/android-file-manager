@@ -1,23 +1,37 @@
 package com.abdulrauf.filemanager.managers;
 
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.EditText;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.abdulrauf.filemanager.MainActivity;
 import com.abdulrauf.filemanager.R;
+import com.abdulrauf.filemanager.adapters.DisplayFragmentAdapter;
+import com.abdulrauf.filemanager.dialogs.OnLongPressDialog;
 import com.abdulrauf.filemanager.fragments.DisplayFragment;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Locale;
 
 
 /**
@@ -53,16 +67,24 @@ public class EventManager {
         }
     }
 
-    Context context;
-    FragmentManager fm;
-    FileManager fileManager;
+
+    private Context context;
+    private FileManager fileManager;
+    private ArrayList<File> filesAndFolders;
+    private DisplayFragmentAdapter adapter;
+
+
 
     public EventManager(Context context) {
         this.context = context;
-        this.fm = ((MainActivity) context).getFragmentManager();
         fileManager = new FileManager();
     }
 
+    public EventManager(Context context, ArrayList<File> filesAndFolders, DisplayFragmentAdapter adapter){
+        this(context);
+        this.filesAndFolders = filesAndFolders;
+        this.adapter = adapter;
+    }
 
 
     public void open(File file) {
@@ -91,16 +113,26 @@ public class EventManager {
 
         else if(file.isDirectory()) {
 
-            DisplayFragment displayFragment = new DisplayFragment();
-            Bundle bundle = new Bundle();
-            bundle.putString("path",file.getAbsolutePath());
-            displayFragment.setArguments(bundle);
+            filesAndFolders.clear();
+            filesAndFolders.addAll(Arrays.asList(file.listFiles()));
 
-            fm.beginTransaction()
-                    .addToBackStack("prev")
-                    .replace(R.id.RelativeLayoutMain,displayFragment)
-                    .commit();
+            adapter.notifyDataSetChanged();
+            fileManager.pushToPathStack(file);
         }
+    }
+
+
+    public void moveUpDirectory(){
+
+        File file;
+
+        file = fileManager.popFromPathStack().getParentFile();
+        System.out.println("else  " + file);
+
+        filesAndFolders.clear();
+        filesAndFolders.addAll(Arrays.asList(file.listFiles()));
+        adapter.notifyDataSetChanged();
+
     }
 
 
@@ -238,5 +270,10 @@ public class EventManager {
     }
 
 
+    //getters
 
+
+    public FileManager getFileManager() {
+        return fileManager;
+    }
 }

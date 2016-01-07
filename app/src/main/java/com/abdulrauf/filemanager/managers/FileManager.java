@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Stack;
 
 /**
  * Created by abdul on 31/12/15.
@@ -20,6 +21,26 @@ import java.util.Comparator;
 public class FileManager {
 
 
+    private Stack<File> pathStack;
+
+
+    public FileManager() {
+        pathStack = new Stack<>();
+    }
+
+
+    public void pushToPathStack(File file) {
+        pathStack.push(file);
+    }
+
+    public File popFromPathStack() {
+        return pathStack.pop();
+    }
+
+    public int getPathStackItemsCount(){
+        return pathStack.size();
+    }
+    
 
     public String getExtension(String url) {
 
