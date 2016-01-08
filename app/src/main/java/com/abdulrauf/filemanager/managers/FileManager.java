@@ -20,6 +20,10 @@ public class FileManager {
 
 
     private Stack<File> pathStack;
+    private boolean showHiddenFiles;
+    private EventManager.SORT sortingType;
+    private boolean caseSensitive;
+
 
 
     public FileManager() {
@@ -144,7 +148,27 @@ public class FileManager {
     }
 
 
-    public ArrayList<File> sortAscending (ArrayList<File> files, boolean caseSensitive) {
+    public ArrayList<File> sort(ArrayList<File> files) {
+
+        ArrayList<File> sortedFiles = new ArrayList<>();
+
+        switch (sortingType) {
+
+            case ASC :
+                sortedFiles = sortAscending(files);
+                break;
+
+            case DESC:
+                sortedFiles = sortDescending(files);
+                break;
+        }
+
+        return sortedFiles;
+    }
+
+
+
+    public ArrayList<File> sortAscending (ArrayList<File> files) {
 
         if (caseSensitive) {
             Collections.sort(files, new Comparator<File>() {
@@ -166,7 +190,7 @@ public class FileManager {
     }
 
 
-    public ArrayList<File> sortDescending (ArrayList<File> files, boolean caseSensitive) {
+    public ArrayList<File> sortDescending (ArrayList<File> files) {
 
         if (caseSensitive) {
             Collections.sort(files, new Comparator<File>() {
@@ -185,6 +209,55 @@ public class FileManager {
             });
         }
         return files;
+    }
+
+
+    public boolean isHiddenFile(File file) {
+
+        return file.getName().startsWith(".");
+    }
+
+    public ArrayList<File> removeHiddenFiles(ArrayList<File> files) {
+
+        ArrayList<File> list = new ArrayList<>();
+
+        for(File file: files) {
+            if (!isHiddenFile(file))
+                list.add(file);
+        }
+
+        return list;
+    }
+
+
+
+    public void setShowHiddenFiles(boolean showHiddenFiles) {
+        this.showHiddenFiles = showHiddenFiles;
+    }
+
+    public boolean isFileHidden() {
+        return showHiddenFiles;
+    }
+
+    public EventManager.SORT getSortingType() {
+        return sortingType;
+    }
+
+    public void setSortingType(EventManager.SORT sortingType) {
+        this.sortingType = sortingType;
+    }
+
+    public void setSortingStyle(EventManager.SORT sortingType, boolean caseSensitive) {
+        this.sortingType = sortingType;
+        this.caseSensitive = caseSensitive;
+    }
+
+    public boolean isCaseSensitive() {
+        return caseSensitive;
+    }
+
+    public void setCaseSensitive(boolean caseSensitive) {
+        this.caseSensitive = caseSensitive;
     }
 
 

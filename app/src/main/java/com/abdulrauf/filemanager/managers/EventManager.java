@@ -23,6 +23,7 @@ import java.util.Locale;
  */
 public class EventManager {
 
+
     public enum OPERATION {
          DELETE(1),COPY(2) ,MOVE(3);
 
@@ -56,7 +57,6 @@ public class EventManager {
     private FileManager fileManager;
     private ArrayList<File> filesAndFolders;
     private DisplayFragmentAdapter adapter;
-
 
 
     public EventManager(Context context) {
@@ -97,11 +97,10 @@ public class EventManager {
 
         else if(file.isDirectory()) {
 
-            filesAndFolders.clear();
-            filesAndFolders.addAll(Arrays.asList(file.listFiles()));
 
-            adapter.notifyDataSetChanged();
-            fileManager.pushToPathStack(file);
+                populateList(file);
+                fileManager.pushToPathStack(file);
+
         }
     }
 
@@ -109,15 +108,26 @@ public class EventManager {
     public void moveUpDirectory(){
 
         File file;
-
         file = fileManager.popFromPathStack().getParentFile();
 
+        populateList(file);
+    }
+
+
+    public void populateList(File file) {
+
         filesAndFolders.clear();
-        filesAndFolders.addAll(Arrays.asList(file.listFiles()));
+
+        ArrayList<File> list = new ArrayList<>(Arrays.asList(file.listFiles()));
+
+        filesAndFolders.addAll(
+                fileManager.sort(
+                        fileManager.isFileHidden() ? list : fileManager.removeHiddenFiles(list)
+                ));
+
         adapter.notifyDataSetChanged();
 
     }
-
 
 
     public void copy(ArrayList<File> source, File destination){
@@ -144,25 +154,6 @@ public class EventManager {
                 .execute();
 
     }
-
-    public ArrayList<File> sort(SORT type,ArrayList<File> files, boolean caseSensitive) {
-
-        ArrayList<File> sortedFiles = new ArrayList<>();
-
-        switch (type) {
-
-            case ASC :
-                sortedFiles = fileManager.sortAscending(files,caseSensitive);
-                break;
-
-            case DESC:
-                sortedFiles = fileManager.sortDescending(files,caseSensitive);
-                break;
-        }
-
-        return sortedFiles;
-    }
-
 
 
 
@@ -259,4 +250,6 @@ public class EventManager {
     public FileManager getFileManager() {
         return fileManager;
     }
+
+
 }

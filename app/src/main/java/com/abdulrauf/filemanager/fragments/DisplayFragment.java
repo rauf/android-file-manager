@@ -81,8 +81,13 @@ public class DisplayFragment extends Fragment  {
 
         filesAndFolders = new ArrayList<>();
 
+
         adapter = new DisplayFragmentAdapter(filesAndFolders,onItemClickListenerCallback);
         eventManager = new EventManager(getActivity(),filesAndFolders,adapter);
+
+
+        eventManager.getFileManager().setShowHiddenFiles(false);
+        eventManager.getFileManager().setSortingStyle(EventManager.SORT.ASC, false);
 
         recyclerView.setLayoutManager(gridLayoutManager);
         eventManager.open(path);
