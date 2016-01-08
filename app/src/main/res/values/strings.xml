@@ -7,4 +7,6 @@
     <string name="dialog.onlongpress.move">Move</string>
     <string name="dialog.onlongpress.open">Open</string>
     <string name="dialog.onlongpress.share">Share</string>
+    <string name="select">Select</string>
+    <string name="cancel">Cancel</string>
 </resources>

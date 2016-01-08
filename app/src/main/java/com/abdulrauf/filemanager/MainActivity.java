@@ -11,6 +11,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
 import com.abdulrauf.filemanager.fragments.DisplayFragment;
 
@@ -20,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
     DisplayFragment displayFragment;
     FragmentManager fm;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
 
         requestForPermission();
         fm = getFragmentManager();
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         displayFragment = new DisplayFragment();
 

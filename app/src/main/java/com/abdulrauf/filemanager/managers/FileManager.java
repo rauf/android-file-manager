@@ -1,7 +1,6 @@
 package com.abdulrauf.filemanager.managers;
 
 
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -9,7 +8,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Stack;
@@ -40,7 +38,18 @@ public class FileManager {
     public int getPathStackItemsCount(){
         return pathStack.size();
     }
-    
+
+
+    public void initialisePathStackWithAbsolutPath(String dir) {
+
+
+
+    }
+
+    public File getCurrentDirectory(){
+        return pathStack.peek();
+    }
+
 
     public String getExtension(String url) {
 

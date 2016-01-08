@@ -90,7 +90,6 @@ public class OnLongPressDialog extends DialogFragment {
 
 
         builder.setView(view);
-
         return builder.create();
     }
 }

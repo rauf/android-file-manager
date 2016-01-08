@@ -2,8 +2,8 @@ package com.abdulrauf.filemanager.fragments;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.app.Fragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -46,6 +46,8 @@ public class DisplayFragment extends Fragment  {
     private EventManager eventManager;
     private DisplayFragmentAdapter adapter;
     private ActionMode actionMode;
+    private DialogFragment longPressDialog;
+    private boolean clickAllowed;
 
 
       @Override
@@ -86,6 +88,8 @@ public class DisplayFragment extends Fragment  {
         eventManager.open(path);
         recyclerView.setAdapter(adapter);
 
+        clickAllowed = true;
+
         return view;
     }
 
@@ -97,17 +101,25 @@ public class DisplayFragment extends Fragment  {
         @Override
         public void onItemClick(View view, int position) {
             File singleItem = filesAndFolders.get(position);
-            eventManager.open(singleItem);
+
+            if(clickAllowed)
+                eventManager.open(singleItem);
 
         }
 
         @Override
         public void onItemLongClick(View view, int position) {
-            new OnLongPressDialog(onLongPressListenerCallback, position).show(getFragmentManager(), "onLongPressDialog");
+
+            if(clickAllowed) {
+                longPressDialog = new OnLongPressDialog(onLongPressListenerCallback, position);
+                longPressDialog.show(getFragmentManager(), "onLongPressDialog");
+            }
         }
 
         @Override
         public void onIconClick(View view, int position) {
+
+            clickAllowed = false;
 
             if (actionMode != null) {
 
@@ -143,7 +155,7 @@ public class DisplayFragment extends Fragment  {
         }
 
         @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        public boolean onActionItemClicked(ActionMode mode, final MenuItem item) {
 
             switch (item.getItemId()) {
 
@@ -153,23 +165,16 @@ public class DisplayFragment extends Fragment  {
                     return true;
 
                 case R.id.deleteButton1 :
-                    //fileManager.delete(adapter.getSelectedItems());
-                    adapter.notifyItemRangeChanged(0,adapter.getItemCount());
                     Toast.makeText(getActivity(), "Delete Button Clicked", Toast.LENGTH_SHORT).show();
                     mode.finish();
                     return true;
 
                 case R.id.moveButton1 :
-                    Toast.makeText(getActivity(), "Move Button Clicked", Toast.LENGTH_SHORT).show();
-                    eventManager.move(adapter.getSelectedItems(),new File("/sdcard/"));
-                    mode.finish();
-                    return true;
-
                 case R.id.copyButton1 :
-                    Toast.makeText(getActivity(), "Copy Button Clicked", Toast.LENGTH_SHORT).show();
-                    eventManager.copy(adapter.getSelectedItems(), new File("/sdcard/"));
-                    Toast.makeText(getActivity(), "Copy Finished", Toast.LENGTH_SHORT).show();
+
+                    selectTargetAndPerformOperation(adapter.getSelectedItems(), item.getItemId());
                     mode.finish();
+                    adapter.notifyDataSetChanged();
                     return true;
 
                 default:
@@ -177,10 +182,13 @@ public class DisplayFragment extends Fragment  {
             }
         }
 
+
+
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             actionMode = null;
             adapter.clearSelection();
+            clickAllowed = true;
         }
 
     };
@@ -190,36 +198,104 @@ public class DisplayFragment extends Fragment  {
 
         @Override
         public void onOpenButtonClicked(int position) {
-            Toast.makeText(getActivity(), "open Button clicked", Toast.LENGTH_SHORT).show();
+
+            eventManager.open(filesAndFolders.get(position));
+            longPressDialog.dismiss();
         }
 
         @Override
         public void onShareButtonClicked(int position) {
+
             Toast.makeText(getActivity(), "share Button clicked", Toast.LENGTH_SHORT).show();
+            longPressDialog.dismiss();
         }
 
         @Override
         public void onDeleteButtonClicked(int position) {
             Toast.makeText(getActivity(), "delete Button clicked", Toast.LENGTH_SHORT).show();
+            longPressDialog.dismiss();
         }
 
         @Override
         public void onRenameButtonClicked(int position) {
-            Toast.makeText(getActivity(), "rename Button clicked", Toast.LENGTH_SHORT).show();
+
             promptUserForRenameInput(filesAndFolders.get(position));
+            longPressDialog.dismiss();
         }
 
         @Override
         public void onCopyButtonClicked(int position) {
-            Toast.makeText(getActivity(), "copy Button clicked", Toast.LENGTH_SHORT).show();
+
+            ArrayList<File> list = new ArrayList<>();
+            list.add(filesAndFolders.get(position));
+            selectTargetAndPerformOperation(list, R.id.copyButton1);
+            adapter.notifyDataSetChanged();
+            longPressDialog.dismiss();
         }
 
         @Override
         public void onMoveButtonClicked(int position) {
-            Toast.makeText(getActivity(), "move Button clicked", Toast.LENGTH_SHORT).show();
+
+            ArrayList<File> list = new ArrayList<>();
+            list.add(filesAndFolders.get(position));
+            selectTargetAndPerformOperation(list, R.id.moveButton1);
+            adapter.notifyDataSetChanged();
+            longPressDialog.dismiss();
         }
 
     };
+
+
+    private void selectTargetAndPerformOperation(final ArrayList<File> list,final int id) {
+
+        Toast.makeText(getActivity(), "Select a destination", Toast.LENGTH_SHORT).show();
+        toolbar.inflateMenu(R.menu.menu_copy_move);
+
+        toolbar.findViewById(R.id.cancelButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                adapter.clearSelection();
+                toolbar
+                        .getMenu()
+                        .clear();
+            }
+        });
+
+        toolbar.findViewById(R.id.selectButton).setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                File target = eventManager
+                        .getFileManager()
+                        .getCurrentDirectory();
+
+                switch (id) {
+
+                    case R.id.copyButton1:
+                        eventManager.copy(list,target);
+                        Toast.makeText(getActivity(), "Files copied successfully", Toast.LENGTH_SHORT).show();
+                        break;
+
+                    case R.id.moveButton1:
+                        eventManager.move(list,target);
+                        Toast.makeText(getActivity(), "Files moved successfully", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+
+                adapter.clearSelection();
+                toolbar
+                        .getMenu()
+                        .clear();
+
+                for(File file: list) {
+                    filesAndFolders.add(file);
+                }
+            }
+        });
+
+
+    }
 
     private void promptUserForRenameInput(final File file) {
 

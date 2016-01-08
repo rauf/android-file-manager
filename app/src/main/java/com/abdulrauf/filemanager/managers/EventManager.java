@@ -1,32 +1,16 @@
 package com.abdulrauf.filemanager.managers;
 
-import android.app.AlertDialog;
-import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.DialogInterface;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
-import android.view.ActionMode;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
 import android.webkit.MimeTypeMap;
-import android.widget.EditText;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
-import com.abdulrauf.filemanager.MainActivity;
-import com.abdulrauf.filemanager.R;
 import com.abdulrauf.filemanager.adapters.DisplayFragmentAdapter;
-import com.abdulrauf.filemanager.dialogs.OnLongPressDialog;
-import com.abdulrauf.filemanager.fragments.DisplayFragment;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -127,7 +111,6 @@ public class EventManager {
         File file;
 
         file = fileManager.popFromPathStack().getParentFile();
-        System.out.println("else  " + file);
 
         filesAndFolders.clear();
         filesAndFolders.addAll(Arrays.asList(file.listFiles()));
