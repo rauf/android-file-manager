@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Stack;
@@ -123,6 +124,26 @@ public class FileManager {
 
         return true;
     }
+
+
+    public boolean deleteFile(File file) {
+
+            if(file.isFile()){
+                file.delete();
+            }
+            else if(file.isDirectory() && file.canWrite() ) {
+                ArrayList<File> subFiles = new ArrayList<>(Arrays.asList(file.listFiles()));
+
+                for (File subFile : subFiles) {
+
+                    deleteFile(subFile);
+                }
+                file.delete();
+            }
+
+        return true;
+    }
+
 
 
     public boolean renameFileTo(File file,String newName) {

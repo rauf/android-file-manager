@@ -83,7 +83,7 @@ public class DisplayFragment extends Fragment  {
 
 
         adapter = new DisplayFragmentAdapter(filesAndFolders,onItemClickListenerCallback);
-        eventManager = new EventManager(getActivity(),filesAndFolders,adapter);
+        eventManager = new EventManager(getActivity(),this,filesAndFolders,adapter);
 
 
         eventManager.getFileManager().setShowHiddenFiles(false);
@@ -170,7 +170,8 @@ public class DisplayFragment extends Fragment  {
                     return true;
 
                 case R.id.deleteButton1 :
-                    Toast.makeText(getActivity(), "Delete Button Clicked", Toast.LENGTH_SHORT).show();
+                    eventManager.delete(adapter.getSelectedItems());
+                    adapter.deleteSelectedItemsFromList();
                     mode.finish();
                     return true;
 
@@ -179,7 +180,6 @@ public class DisplayFragment extends Fragment  {
 
                     selectTargetAndPerformOperation(adapter.getSelectedItems(), item.getItemId());
                     mode.finish();
-                    adapter.notifyDataSetChanged();
                     return true;
 
                 default:
@@ -217,7 +217,11 @@ public class DisplayFragment extends Fragment  {
 
         @Override
         public void onDeleteButtonClicked(int position) {
-            Toast.makeText(getActivity(), "delete Button clicked", Toast.LENGTH_SHORT).show();
+            ArrayList<File> files = new ArrayList<>();
+            files.add(filesAndFolders.get(position));
+            eventManager.delete(files);
+            filesAndFolders.remove(position);
+            adapter.notifyDataSetChanged();
             longPressDialog.dismiss();
         }
 
@@ -296,6 +300,7 @@ public class DisplayFragment extends Fragment  {
                 for(File file: list) {
                     filesAndFolders.add(file);
                 }
+                adapter.notifyDataSetChanged();
             }
         });
 

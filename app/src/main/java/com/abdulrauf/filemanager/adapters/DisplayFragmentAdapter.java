@@ -153,6 +153,15 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
         return list;
     }
 
+    public void deleteSelectedItemsFromList(){
+
+        for (int i = 0; i < selectedItems.size(); i++) {
+            filesAndFolders.remove(selectedItems.keyAt(i));
+        }
+
+        notifyDataSetChanged();
+    }
+
     public int getSelectedItemsCount() {
         return selectedItems.size();
     }

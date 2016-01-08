@@ -11,6 +11,8 @@ import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import com.abdulrauf.filemanager.adapters.DisplayFragmentAdapter;
+import com.abdulrauf.filemanager.fragments.DisplayFragment;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,17 +59,16 @@ public class EventManager {
     private FileManager fileManager;
     private ArrayList<File> filesAndFolders;
     private DisplayFragmentAdapter adapter;
+    private DisplayFragment displayFragment;
 
 
-    public EventManager(Context context) {
+    public EventManager(Context context, DisplayFragment displayFragment, ArrayList<File> filesAndFolders, DisplayFragmentAdapter adapter){
+
         this.context = context;
-        fileManager = new FileManager();
-    }
-
-    public EventManager(Context context, ArrayList<File> filesAndFolders, DisplayFragmentAdapter adapter){
-        this(context);
+        this.displayFragment = displayFragment;
         this.filesAndFolders = filesAndFolders;
         this.adapter = adapter;
+        fileManager = new FileManager();
     }
 
 
@@ -97,9 +98,9 @@ public class EventManager {
 
         else if(file.isDirectory()) {
 
-
-                populateList(file);
-                fileManager.pushToPathStack(file);
+            populateList(file);
+            displayFragment.getToolbar().setTitle(file.getName());
+            fileManager.pushToPathStack(file);
 
         }
     }
@@ -109,8 +110,8 @@ public class EventManager {
 
         File file;
         file = fileManager.popFromPathStack().getParentFile();
-
         populateList(file);
+        displayFragment.getToolbar().setTitle(file.getName());
     }
 
 
@@ -126,7 +127,6 @@ public class EventManager {
                 ));
 
         adapter.notifyDataSetChanged();
-
     }
 
 
@@ -156,6 +156,11 @@ public class EventManager {
     }
 
 
+    public void delete (ArrayList<File> files ) {
+
+        new BackgroundWork(OPERATION.DELETE,files)
+                .execute();
+    }
 
 
     private class BackgroundWork extends AsyncTask< Void, Integer, Boolean> {
@@ -169,6 +174,11 @@ public class EventManager {
             this.operation = operation;
             this.sources = sources;
             this.destination = destination;
+        }
+
+        public BackgroundWork(OPERATION operation, ArrayList<File> sources) {
+            this.operation = operation;
+            this.sources = sources;
         }
 
         @Override
@@ -188,9 +198,17 @@ public class EventManager {
 
                 case MOVE:
                     progressDialog.setTitle("Moving...");
-                    progressDialog.setMessage("Files are being moves");
+                    progressDialog.setMessage("Files are being moved");
                     progressDialog.show();
                     break;
+
+
+                case DELETE:
+                    progressDialog.setTitle("Deleting...");
+                    progressDialog.setMessage("Files are being deleted");
+                    progressDialog.show();
+                    break;
+
             }
         }
 
@@ -218,6 +236,19 @@ public class EventManager {
                         try{
                             fileManager.moveToDirectory(source,destination);
                         } catch (Exception e){
+                            e.printStackTrace();
+                            return false;
+                        }
+                    }
+                    break;
+
+
+                case DELETE:
+                    for(File source: sources) {
+
+                        try {
+                            fileManager.deleteFile(source);
+                        } catch (Exception e) {
                             e.printStackTrace();
                             return false;
                         }
