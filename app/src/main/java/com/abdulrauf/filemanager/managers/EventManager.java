@@ -163,7 +163,7 @@ public class EventManager {
     }
 
 
-    private class BackgroundWork extends AsyncTask< Void, Integer, Boolean> {
+    private class BackgroundWork extends AsyncTask< Void, String, Boolean> {
 
         OPERATION operation;
         private ProgressDialog progressDialog;
@@ -191,25 +191,20 @@ public class EventManager {
 
                 case COPY:
                     progressDialog.setTitle("Copying...");
-                    progressDialog.setMessage("Files are being copied");
-                    progressDialog.show();
                     break;
-
 
                 case MOVE:
                     progressDialog.setTitle("Moving...");
-                    progressDialog.setMessage("Files are being moved");
-                    progressDialog.show();
                     break;
-
 
                 case DELETE:
                     progressDialog.setTitle("Deleting...");
-                    progressDialog.setMessage("Files are being deleted");
-                    progressDialog.show();
                     break;
 
             }
+
+            progressDialog.show();
+
         }
 
         @Override
@@ -223,6 +218,7 @@ public class EventManager {
                     for (File source : sources) {
                         try {
                             fileManager.copyToDirectory(source,destination);
+                            publishProgress(source.getName());
 
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -235,6 +231,8 @@ public class EventManager {
                     for(File source: sources) {
                         try{
                             fileManager.moveToDirectory(source,destination);
+                            publishProgress(source.getName());
+
                         } catch (Exception e){
                             e.printStackTrace();
                             return false;
@@ -248,6 +246,8 @@ public class EventManager {
 
                         try {
                             fileManager.deleteFile(source);
+                            publishProgress(source.getName());
+
                         } catch (Exception e) {
                             e.printStackTrace();
                             return false;
@@ -263,8 +263,25 @@ public class EventManager {
         }
 
         @Override
-        protected void onProgressUpdate(Integer... values) {
+        protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
+
+            switch (operation) {
+
+                case COPY :
+                    progressDialog.setMessage("Copying  " + values[0]);
+                    break;
+
+                case MOVE :
+                    progressDialog.setMessage("Moving  " + values[0]);
+                    break;
+
+                case DELETE :
+                    progressDialog.setMessage("Deleting  " + values[0]);
+                    break;
+            }
+
+
         }
 
         @Override

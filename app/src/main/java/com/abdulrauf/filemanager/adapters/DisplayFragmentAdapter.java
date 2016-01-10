@@ -1,6 +1,10 @@
 package com.abdulrauf.filemanager.adapters;
 
+import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
@@ -12,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.abdulrauf.filemanager.R;
+import com.abdulrauf.filemanager.managers.FileManager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -34,11 +39,15 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
     private ArrayList<File> filesAndFolders;
     private OnItemClickListener onItemClickListener;
     private SparseBooleanArray selectedItems;
+    private FileManager fileManager;
+    private Context context;
 
-    public DisplayFragmentAdapter(ArrayList<File> filesAndFolders, OnItemClickListener onItemClickListener) {
+    public DisplayFragmentAdapter(ArrayList<File> filesAndFolders, OnItemClickListener onItemClickListener, Context context) {
         this.filesAndFolders = filesAndFolders;
         this.onItemClickListener = onItemClickListener;
         selectedItems = new SparseBooleanArray();
+        this.context = context;
+        fileManager = new FileManager();
     }
 
     @Override
@@ -56,7 +65,9 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
         final File singleItem = filesAndFolders.get(position);
 
         holder.title.setText(singleItem.getName());
-        holder.lastModified.setText( new Date(singleItem.lastModified()).toString());
+        holder.lastModified.setText(new Date(singleItem.lastModified()).toString());
+        setIcon(singleItem, holder);
+
 
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,7 +87,7 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
         holder.icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onItemClickListener.onIconClick(holder.cardView,position);
+                onItemClickListener.onIconClick(holder.cardView, position);
             }
         });
 
@@ -85,7 +96,106 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
         }
         else holder.cardView.setCardBackgroundColor(Color.parseColor("#FFFFFF"));
 
+
     }
+
+
+    public void setIcon(File file, ListItemViewHolder holder) {
+
+        String extension;
+        Drawable drawable = null;
+
+        try {
+
+            extension = fileManager.getExtension(file.getAbsolutePath());
+            System.out.println(file.getName());
+
+
+            if (file.isFile()) {
+
+                switch (extension) {
+
+                    case ".c":
+                    case ".cpp":
+                    case ".doc":
+                    case ".docx":
+                    case ".exe":
+                    case ".h":
+                    case ".html":
+                    case ".java":
+                    case ".log":
+                    case ".txt":
+                    case ".pdf":
+                    case ".ppt":
+                    case ".xls":
+                        drawable = ContextCompat.getDrawable(context, R.drawable.ic_file);
+                        break;
+
+                    case ".3ga":
+                    case ".aac":
+                    case ".mp3":
+                    case ".m4a":
+                    case ".ogg":
+                    case ".wav":
+                    case ".wma":
+                        drawable = ContextCompat.getDrawable(context, R.drawable.ic_audio);
+                        break;
+
+                    case ".3gp":
+                    case ".avi":
+                    case ".mpg":
+                    case ".mpeg":
+                    case ".mp4":
+                    case ".mkv":
+                    case ".webm":
+                    case ".wmv":
+                    case ".vob":
+                        drawable = ContextCompat.getDrawable(context, R.drawable.ic_video);
+                        break;
+
+                    case ".ai":
+                    case ".bmp":
+                    case ".exif":
+                    case ".gif":
+                    case ".jpg":
+                    case ".jpeg":
+                    case ".png":
+                    case ".svg":
+                        drawable = ContextCompat.getDrawable(context, R.drawable.ic_image);
+                        break;
+
+                    case ".rar":
+                    case ".zip":
+                    case ".ZIP":
+                        drawable = ContextCompat.getDrawable(context, R.drawable.ic_compressed);
+                        break;
+
+                    case ".rc":
+                        drawable = ContextCompat.getDrawable(context, R.drawable.ic_error);
+                        break;
+
+
+                    default:
+                        drawable = ContextCompat.getDrawable(context, R.drawable.ic_error);
+                        break;
+                }
+
+            }  else if (file.isDirectory()) {
+                drawable = ContextCompat.getDrawable(context, R.drawable.ic_folder);
+            }
+
+            else drawable = ContextCompat.getDrawable(context, R.drawable.ic_error);
+
+        }   catch (Exception e) {
+            drawable = ContextCompat.getDrawable(context,R.drawable.ic_error);
+        }
+
+        drawable = DrawableCompat.wrap(drawable);
+        holder.icon.setImageDrawable(drawable);
+
+    }
+
+
 
     @Override
     public int getItemCount() {

@@ -82,7 +82,7 @@ public class DisplayFragment extends Fragment  {
         filesAndFolders = new ArrayList<>();
 
 
-        adapter = new DisplayFragmentAdapter(filesAndFolders,onItemClickListenerCallback);
+        adapter = new DisplayFragmentAdapter(filesAndFolders,onItemClickListenerCallback,getActivity());
         eventManager = new EventManager(getActivity(),this,filesAndFolders,adapter);
 
 
