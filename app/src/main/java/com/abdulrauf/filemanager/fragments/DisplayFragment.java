@@ -268,6 +268,8 @@ public class DisplayFragment extends Fragment  {
                 toolbar
                         .getMenu()
                         .clear();
+
+                toolbar.inflateMenu(R.menu.menu_main);
             }
         });
 
@@ -283,12 +285,10 @@ public class DisplayFragment extends Fragment  {
 
                     case R.id.copyButton1:
                         eventManager.copy(list,target);
-                        Toast.makeText(getActivity(), "Files copied successfully", Toast.LENGTH_SHORT).show();
                         break;
 
                     case R.id.moveButton1:
                         eventManager.move(list,target);
-                        Toast.makeText(getActivity(), "Files moved successfully", Toast.LENGTH_SHORT).show();
                         break;
                 }
 
@@ -296,6 +296,8 @@ public class DisplayFragment extends Fragment  {
                 toolbar
                         .getMenu()
                         .clear();
+
+                toolbar.inflateMenu(R.menu.menu_main);
 
                 for(File file: list) {
                     filesAndFolders.add(file);
@@ -319,11 +321,16 @@ public class DisplayFragment extends Fragment  {
                 .setPositiveButton("Rename", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        eventManager.rename(file,
-                                editText.getText().toString());
+
+                        if(eventManager.getFileManager().renameFileTo(file,editText.getText().toString())) {
+                            Toast.makeText(getActivity(), "Rename successful", Toast.LENGTH_SHORT).show();
+                            eventManager.populateList(eventManager.getFileManager().getCurrentDirectory());
+                        }
+                        else Toast.makeText(getActivity(),"Cannot rename",Toast.LENGTH_SHORT).show();
+
                     }
                 })
-                .setNegativeButton("Cancel",null)
+                .setNegativeButton("Cancel", null)
                 .create()
                 .show();
     }

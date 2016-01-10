@@ -232,6 +232,11 @@ public class FileManager {
         return files;
     }
 
+    public boolean newFolder(File dir, String name) {
+
+        return new File(dir,name).mkdir();
+    }
+
 
     public boolean isHiddenFile(File file) {
 

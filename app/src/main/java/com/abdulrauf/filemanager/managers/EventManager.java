@@ -1,13 +1,17 @@
 package com.abdulrauf.filemanager.managers;
 
+import android.app.AlertDialog;
+
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.webkit.MimeTypeMap;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.abdulrauf.filemanager.adapters.DisplayFragmentAdapter;
@@ -17,7 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Locale;
 
 
 /**
@@ -137,17 +140,7 @@ public class EventManager {
 
     }
 
-    public void rename(File file,String name) {
 
-        if(fileManager.renameFileTo(file,name))
-            Toast.makeText(context,"Rename successful",Toast.LENGTH_SHORT).show();
-
-        else Toast.makeText(context,"Cannot rename",Toast.LENGTH_SHORT).show();
-
-    }
-
-
-    
     public void move(ArrayList<File> sources,File destination) {
 
         new BackgroundWork(OPERATION.MOVE,sources,destination)
@@ -163,12 +156,14 @@ public class EventManager {
     }
 
 
+
+
     private class BackgroundWork extends AsyncTask< Void, String, Boolean> {
 
-        OPERATION operation;
+        private OPERATION operation;
         private ProgressDialog progressDialog;
-        ArrayList<File> sources;
-        File destination;
+        private ArrayList<File> sources;
+        private File destination;
 
         public BackgroundWork(OPERATION operation, ArrayList<File> sources, File destination) {
             this.operation = operation;
@@ -217,8 +212,8 @@ public class EventManager {
 
                     for (File source : sources) {
                         try {
-                            fileManager.copyToDirectory(source,destination);
                             publishProgress(source.getName());
+                            fileManager.copyToDirectory(source,destination);
 
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -230,8 +225,8 @@ public class EventManager {
                 case MOVE:
                     for(File source: sources) {
                         try{
-                            fileManager.moveToDirectory(source,destination);
                             publishProgress(source.getName());
+                            fileManager.moveToDirectory(source,destination);
 
                         } catch (Exception e){
                             e.printStackTrace();
@@ -245,8 +240,8 @@ public class EventManager {
                     for(File source: sources) {
 
                         try {
-                            fileManager.deleteFile(source);
                             publishProgress(source.getName());
+                            fileManager.deleteFile(source);
 
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -287,6 +282,23 @@ public class EventManager {
         @Override
         protected void onPostExecute(Boolean aVoid) {
             progressDialog.dismiss();
+
+            switch (operation) {
+
+                case COPY :
+                    Toast.makeText(context,"Files successfully copied",Toast.LENGTH_SHORT).show();
+                    break;
+
+                case MOVE :
+                    Toast.makeText(context,"Files successfully moved",Toast.LENGTH_SHORT).show();
+                    break;
+
+                case DELETE :
+                    Toast.makeText(context,"Files successfully deleted",Toast.LENGTH_SHORT).show();
+                    break;
+
+            }
+
         }
 
     }

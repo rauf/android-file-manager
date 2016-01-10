@@ -108,8 +108,6 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
         try {
 
             extension = fileManager.getExtension(file.getAbsolutePath());
-            System.out.println(file.getName());
-
 
             if (file.isFile()) {
 
@@ -169,11 +167,6 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
                     case ".ZIP":
                         drawable = ContextCompat.getDrawable(context, R.drawable.ic_compressed);
                         break;
-
-                    case ".rc":
-                        drawable = ContextCompat.getDrawable(context, R.drawable.ic_error);
-                        break;
-
 
                     default:
                         drawable = ContextCompat.getDrawable(context, R.drawable.ic_error);
