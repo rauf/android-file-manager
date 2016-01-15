@@ -1,19 +1,24 @@
 package com.abdulrauf.filemanager.managers;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+import android.content.ClipData;
 import android.content.Context;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v4.app.ShareCompat;
+import android.support.v4.content.FileProvider;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.abdulrauf.filemanager.BuildConfig;
 import com.abdulrauf.filemanager.adapters.DisplayFragmentAdapter;
 import com.abdulrauf.filemanager.fragments.DisplayFragment;
 
@@ -132,6 +137,24 @@ public class EventManager {
         adapter.notifyDataSetChanged();
     }
 
+
+    public void share(ArrayList<File> files) {
+
+
+        Uri contentUri = FileProvider.getUriForFile(context, "com.abdulrauf.filemanager.fileprovider", files.get(0));
+        ClipData clipData = ClipData.newRawUri(null, contentUri);
+
+        for (int i = 1; i < files.size() ; i++) {
+            Uri otherUri = FileProvider.getUriForFile(context, "com.abdulrauf.filemanager.fileprovider", files.get(i));
+            clipData.addItem(new ClipData.Item(otherUri));
+        }
+
+        Intent intent = ShareCompat.IntentBuilder.from((Activity) context).setType("*/*").setStream(contentUri).getIntent();
+        intent.setClipData(clipData);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        context.startActivity(intent);
+
+    }
 
     public void copy(ArrayList<File> source, File destination){
 

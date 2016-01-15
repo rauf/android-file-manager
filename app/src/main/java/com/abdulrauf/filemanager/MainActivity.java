@@ -6,6 +6,7 @@ import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v7.widget.Toolbar;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.abdulrauf.filemanager.fragments.DisplayFragment;
@@ -23,7 +25,10 @@ import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
-    DisplayFragment displayFragment;
+
+    final String DISPLAY_FRAGMENT_TAG = "displayFragment";
+
+    RelativeLayout relativeLayout;
     FragmentManager fm;
     Toolbar toolbar;
 
@@ -32,20 +37,28 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        relativeLayout = (RelativeLayout) findViewById(R.id.RelativeLayoutMain);
+
         requestForPermission();
         fm = getFragmentManager();
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
 
-        displayFragment = new DisplayFragment();
-        setSupportActionBar(toolbar);
+        StrictMode.setThreadPolicy(
+                new StrictMode.ThreadPolicy.Builder().detectAll()
+                        .penaltyLog().build());
 
-        fm.beginTransaction()
-                .add(R.id.RelativeLayoutMain, displayFragment)
-                .addToBackStack("displayFragment")
-                .commit();
+        if(fm.findFragmentById(R.id.RelativeLayoutMain) == null) {
+            DisplayFragment displayFragment = new DisplayFragment();
+            setSupportActionBar(toolbar);
 
+            fm.beginTransaction()
+                    .add(R.id.RelativeLayoutMain, displayFragment,DISPLAY_FRAGMENT_TAG)
+                    .addToBackStack(DISPLAY_FRAGMENT_TAG)
+                    .commit();
+        }
     }
+
 
 
     private void requestForPermission() {
@@ -89,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 
+        DisplayFragment displayFragment = (DisplayFragment) fm.findFragmentByTag(DISPLAY_FRAGMENT_TAG);
+
         int count = displayFragment
                 .getEventManager()
                 .getFileManager()
@@ -121,7 +136,6 @@ public class MainActivity extends AppCompatActivity {
                 createNewFolderInCurrDirectory();
                 return true;
 
-
         }
 
         return super.onOptionsItemSelected(item);
@@ -129,6 +143,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void createNewFolderInCurrDirectory() {
+
+        final DisplayFragment displayFragment = (DisplayFragment) fm.findFragmentByTag(DISPLAY_FRAGMENT_TAG);
 
         final FileManager fileManager = displayFragment
                                     .getEventManager()

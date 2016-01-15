@@ -6,6 +6,8 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +22,7 @@ import com.abdulrauf.filemanager.fragments.DisplayFragment;
  */
 public class OnLongPressDialog extends DialogFragment {
 
-    public interface OnLongPressListener {
+    public interface OnLongPressListener extends Parcelable{
 
         public void onOpenButtonClicked(int position);
         public void onShareButtonClicked(int position);
@@ -28,22 +30,33 @@ public class OnLongPressDialog extends DialogFragment {
         public void onRenameButtonClicked(int position);
         public void onCopyButtonClicked(int position);
         public void onMoveButtonClicked(int position);
+
     }
 
-    OnLongPressListener onLongPressListener;
-    int position;
+    private static String POSITION_KEY = "position";
+    private static String LISTENER_KEY = "onLongPressListener";
 
 
-    public OnLongPressDialog(OnLongPressListener onLongPressListener, int position) {
-        this.onLongPressListener = onLongPressListener;
-        this.position = position;
+    public static OnLongPressDialog newInstance(OnLongPressListener onLongPressListener,int pos) {
+
+        Bundle args = new Bundle();
+
+        OnLongPressDialog fragment = new OnLongPressDialog();
+
+        args.putInt(POSITION_KEY,pos);
+        args.putParcelable(LISTENER_KEY, onLongPressListener);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_on_long_press,null);
+        final int position = getArguments().getInt(POSITION_KEY);
+        final OnLongPressListener onLongPressListener = getArguments().getParcelable(LISTENER_KEY);
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_on_long_press,null);
 
         ((TextView) view.findViewById(R.id.openButton)).setOnClickListener(new View.OnClickListener() {
             @Override

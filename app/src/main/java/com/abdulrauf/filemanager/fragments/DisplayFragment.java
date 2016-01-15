@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Parcel;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
@@ -72,6 +73,8 @@ public class DisplayFragment extends Fragment  {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_display,container,false);
 
+        setRetainInstance(true);
+
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(),2);
         gridLayoutManager.setOrientation(GridLayoutManager.VERTICAL);
@@ -100,7 +103,6 @@ public class DisplayFragment extends Fragment  {
 
 
 
-
     private DisplayFragmentAdapter.OnItemClickListener onItemClickListenerCallback = new DisplayFragmentAdapter.OnItemClickListener() {
 
         @Override
@@ -116,7 +118,8 @@ public class DisplayFragment extends Fragment  {
         public void onItemLongClick(View view, int position) {
 
             if(clickAllowed) {
-                longPressDialog = new OnLongPressDialog(onLongPressListenerCallback, position);
+                //longPressDialog = new OnLongPressDialog(onLongPressListenerCallback, position);
+                longPressDialog = OnLongPressDialog.newInstance(onLongPressListenerCallback,position);
                 longPressDialog.show(getFragmentManager(), "onLongPressDialog");
             }
         }
@@ -211,7 +214,11 @@ public class DisplayFragment extends Fragment  {
         @Override
         public void onShareButtonClicked(int position) {
 
-            Toast.makeText(getActivity(), "share Button clicked", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "share Button clicked", Toast.LENGTH_SHORT).show();
+
+            ArrayList<File> files = new ArrayList<File>();
+            files.add(filesAndFolders.get(position));
+            eventManager.share(files);
             longPressDialog.dismiss();
         }
 
@@ -252,6 +259,15 @@ public class DisplayFragment extends Fragment  {
             longPressDialog.dismiss();
         }
 
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
     };
 
 
