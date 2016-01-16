@@ -1,9 +1,10 @@
-package com.abdulrauf.filemanager;
+package com.abdulrauf.filemanager.activities;
 
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -17,6 +18,7 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.abdulrauf.filemanager.R;
 import com.abdulrauf.filemanager.fragments.DisplayFragment;
 import com.abdulrauf.filemanager.managers.FileManager;
 
@@ -69,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
             if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 
-                promptForPermissionsDialog("You need to give access to External Storage", new DialogInterface.OnClickListener() {
+                promptForPermissionsDialog(getString(R.string.error_request_permission), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         ActivityCompat.requestPermissions(MainActivity.this,
@@ -92,8 +94,8 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 
         builder.setMessage(message)
-                .setPositiveButton("OK", onClickListener)
-                .setNegativeButton("Cancel", null)
+                .setPositiveButton(getString(R.string.ok), onClickListener)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .create()
                 .show();
 
@@ -136,6 +138,13 @@ public class MainActivity extends AppCompatActivity {
                 createNewFolderInCurrDirectory();
                 return true;
 
+            case R.id.action_settings:
+                Intent intent = new Intent(this,PrefsActivity.class);
+                // bypassing the single header
+                intent.putExtra( PrefsActivity.EXTRA_SHOW_FRAGMENT, PrefsActivity.Header1.class.getName() );
+                intent.putExtra( PrefsActivity.EXTRA_NO_HEADERS, true );
+                startActivity(intent);
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -156,20 +165,20 @@ public class MainActivity extends AppCompatActivity {
 
         final EditText editText = new EditText(this);
 
-        builder.setMessage("Enter name of New Folder ")
+        builder.setMessage(getString(R.string.prompt_create_folder))
                 .setView(editText)
-                .setPositiveButton("Create", new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.create), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
                         if(fileManager.newFolder(dir,editText.getText().toString())) {
-                            Toast.makeText(MainActivity.this, "Folder created successfully", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, getString(R.string.success_create_folder), Toast.LENGTH_SHORT).show();
                             displayFragment.getEventManager().populateList(fileManager.getCurrentDirectory());
                         }
-                        else Toast.makeText(MainActivity.this,"Cannot create New Folder",Toast.LENGTH_SHORT).show();
+                        else Toast.makeText(MainActivity.this,getString(R.string.error_create_folder),Toast.LENGTH_SHORT).show();
                     }
                 })
-                .setNegativeButton("Cancel",null)
+                .setNegativeButton(getString(R.string.cancel),null)
                 .create()
                 .show();
 

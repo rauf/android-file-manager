@@ -22,7 +22,7 @@ public class FileManager {
 
     private Stack<File> pathStack;
     private boolean showHiddenFiles;
-    private EventManager.SORT sortingType;
+    private String sortingType;
     private boolean caseSensitive;
 
 
@@ -175,13 +175,16 @@ public class FileManager {
 
         switch (sortingType) {
 
-            case ASC :
+            case EventManager.SORT_ASC :
                 sortedFiles = sortAscending(files);
                 break;
 
-            case DESC:
+            case EventManager.SORT_DESC:
                 sortedFiles = sortDescending(files);
                 break;
+
+            default:
+                return files;
         }
 
         return sortedFiles;
@@ -265,15 +268,15 @@ public class FileManager {
         return showHiddenFiles;
     }
 
-    public EventManager.SORT getSortingType() {
+    public String getSortingType() {
         return sortingType;
     }
 
-    public void setSortingType(EventManager.SORT sortingType) {
+    public void setSortingType(String sortingType) {
         this.sortingType = sortingType;
     }
 
-    public void setSortingStyle(EventManager.SORT sortingType, boolean caseSensitive) {
+    public void setSortingStyle(String sortingType, boolean caseSensitive) {
         this.sortingType = sortingType;
         this.caseSensitive = caseSensitive;
     }

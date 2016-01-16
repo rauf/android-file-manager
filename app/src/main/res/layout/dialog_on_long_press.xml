@@ -16,7 +16,7 @@
             style="@style/LongPressDialogFont">
 
             <TextView
-                android:text="@string/dialog.onlongpress.open"
+                android:text="@string/open"
                 android:id="@+id/openButton"
                 style="@style/LongPressDialogFont" />
 
@@ -24,7 +24,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/dialog.onlongpress.share"
+                android:text="@string/share"
                 android:id="@+id/shareButton"
                 android:layout_column="1"
                 style="@style/LongPressDialogFont" />
@@ -39,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/dialog.onlongpress.delete"
+                android:text="@string/delete"
                 android:id="@+id/deleteButton"
                 android:layout_column="0"
                 style="@style/LongPressDialogFont" />
@@ -48,7 +48,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/dialog.onlongpress.rename"
+                android:text="@string/rename"
                 android:id="@+id/renameButton"
                 android:layout_column="1"
                 style="@style/LongPressDialogFont" />
@@ -63,7 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/dialog.onlongpress.copy"
+                android:text="@string/copy"
                 android:id="@+id/copyButton"
                 android:layout_column="0"
                 style="@style/LongPressDialogFont" />
@@ -72,7 +72,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/dialog.onlongpress.move"
+                android:text="@string/move"
                 android:id="@+id/moveButton"
                 android:layout_column="1"
                 style="@style/LongPressDialogFont" />

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="sort">
+        <item>No ordering</item>
+        <item>Ascending</item>
+        <item>Descending</item>
+    </string-array>
+
+    <string-array name="sort_codes">
+        <item>NONE</item>
+        <item>ASC</item>
+        <item>DESC</item>
+    </string-array>
+    
+    
+</resources>

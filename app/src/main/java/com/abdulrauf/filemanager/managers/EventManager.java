@@ -18,7 +18,6 @@ import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.abdulrauf.filemanager.BuildConfig;
 import com.abdulrauf.filemanager.adapters.DisplayFragmentAdapter;
 import com.abdulrauf.filemanager.fragments.DisplayFragment;
 
@@ -27,6 +26,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static java.lang.String.*;
+
 
 /**
  * Created by abdul on 5/1/16.
@@ -34,33 +35,14 @@ import java.util.Arrays;
 public class EventManager {
 
 
-    public enum OPERATION {
-         DELETE(1),COPY(2) ,MOVE(3);
+    public static final String SORT_ASC = "ASC";
+    public static final String SORT_DESC = "DESC";
 
-        private int val;
+    public static final String OPERATION_DELETE = "DELETE";
+    public static final String OPERATION_COPY = "COPY";
+    public static final String OPERATION_MOVE = "MOVE";
+    public static final String OPERATION_POPULATE_LIST = "POPULATE_LIST";
 
-        OPERATION(int val){
-            this.val = val;
-        }
-
-        public int getValue(){
-            return val;
-        }
-    }
-
-    public enum SORT{
-        ASC(1),DESC(2);
-
-        private int val;
-
-        SORT(int val) {
-            this.val = val;
-        }
-
-        public int getValue(){
-            return val;
-        }
-    }
 
 
     private Context context;
@@ -123,18 +105,14 @@ public class EventManager {
     }
 
 
+    public void refreshCurrentDirectory() {
+
+        populateList(fileManager.getCurrentDirectory());
+    }
+
     public void populateList(File file) {
 
-        filesAndFolders.clear();
-
-        ArrayList<File> list = new ArrayList<>(Arrays.asList(file.listFiles()));
-
-        filesAndFolders.addAll(
-                fileManager.sort(
-                        fileManager.isFileHidden() ? list : fileManager.removeHiddenFiles(list)
-                ));
-
-        adapter.notifyDataSetChanged();
+        new BackgroundWork(OPERATION_POPULATE_LIST,null,file).execute();
     }
 
 
@@ -158,7 +136,7 @@ public class EventManager {
 
     public void copy(ArrayList<File> source, File destination){
 
-        new BackgroundWork(OPERATION.COPY,source,destination)
+        new BackgroundWork(OPERATION_COPY,source,destination)
                 .execute();
 
     }
@@ -166,7 +144,7 @@ public class EventManager {
 
     public void move(ArrayList<File> sources,File destination) {
 
-        new BackgroundWork(OPERATION.MOVE,sources,destination)
+        new BackgroundWork(OPERATION_MOVE,sources,destination)
                 .execute();
 
     }
@@ -174,7 +152,7 @@ public class EventManager {
 
     public void delete (ArrayList<File> files ) {
 
-        new BackgroundWork(OPERATION.DELETE,files)
+        new BackgroundWork(OPERATION_DELETE,files,null)
                 .execute();
     }
 
@@ -183,45 +161,50 @@ public class EventManager {
 
     private class BackgroundWork extends AsyncTask< Void, String, Boolean> {
 
-        private OPERATION operation;
+        private String operation;
         private ProgressDialog progressDialog;
         private ArrayList<File> sources;
         private File destination;
 
-        public BackgroundWork(OPERATION operation, ArrayList<File> sources, File destination) {
+        public BackgroundWork(String operation, ArrayList<File> sources, File destination) {
             this.operation = operation;
             this.sources = sources;
             this.destination = destination;
         }
 
-        public BackgroundWork(OPERATION operation, ArrayList<File> sources) {
-            this.operation = operation;
-            this.sources = sources;
-        }
-
         @Override
         protected void onPreExecute() {
 
-            progressDialog = new ProgressDialog(context);
-            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 
             switch (operation) {
 
-                case COPY:
+                case OPERATION_COPY:
+                    progressDialog = new ProgressDialog(context);
+                    progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                     progressDialog.setTitle("Copying...");
+                    progressDialog.show();
                     break;
 
-                case MOVE:
+                case OPERATION_MOVE:
+                    progressDialog = new ProgressDialog(context);
+                    progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                     progressDialog.setTitle("Moving...");
+                    progressDialog.show();
                     break;
 
-                case DELETE:
+                case OPERATION_DELETE:
+                    progressDialog = new ProgressDialog(context);
+                    progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                     progressDialog.setTitle("Deleting...");
+                    progressDialog.show();
+                    break;
+
+                case OPERATION_POPULATE_LIST:
                     break;
 
             }
 
-            progressDialog.show();
+
 
         }
 
@@ -231,7 +214,7 @@ public class EventManager {
 
             switch (operation) {
 
-                case COPY:
+                case OPERATION_COPY:
 
                     for (File source : sources) {
                         try {
@@ -245,7 +228,7 @@ public class EventManager {
                     }
                     break;
 
-                case MOVE:
+                case OPERATION_MOVE:
                     for(File source: sources) {
                         try{
                             publishProgress(source.getName());
@@ -259,7 +242,7 @@ public class EventManager {
                     break;
 
 
-                case DELETE:
+                case OPERATION_DELETE:
                     for(File source: sources) {
 
                         try {
@@ -271,6 +254,18 @@ public class EventManager {
                             return false;
                         }
                     }
+                    break;
+
+
+                case OPERATION_POPULATE_LIST:
+
+                    filesAndFolders.clear();
+                    ArrayList<File> list = new ArrayList<>(Arrays.asList(destination.listFiles()));
+
+                    filesAndFolders.addAll(
+                            fileManager.sort(
+                                    fileManager.isFileHidden() ? list : fileManager.removeHiddenFiles(list)
+                            ));
                     break;
 
             }
@@ -286,38 +281,48 @@ public class EventManager {
 
             switch (operation) {
 
-                case COPY :
+                case OPERATION_COPY :
                     progressDialog.setMessage("Copying  " + values[0]);
                     break;
 
-                case MOVE :
+                case OPERATION_MOVE :
                     progressDialog.setMessage("Moving  " + values[0]);
                     break;
 
-                case DELETE :
+                case OPERATION_DELETE :
                     progressDialog.setMessage("Deleting  " + values[0]);
                     break;
-            }
 
+
+            }
 
         }
 
         @Override
         protected void onPostExecute(Boolean aVoid) {
-            progressDialog.dismiss();
 
             switch (operation) {
 
-                case COPY :
+                case OPERATION_COPY :
+                    progressDialog.dismiss();
                     Toast.makeText(context,"Files successfully copied",Toast.LENGTH_SHORT).show();
+                    refreshCurrentDirectory();
                     break;
 
-                case MOVE :
+                case OPERATION_MOVE :
+                    progressDialog.dismiss();
                     Toast.makeText(context,"Files successfully moved",Toast.LENGTH_SHORT).show();
+                    refreshCurrentDirectory();
                     break;
 
-                case DELETE :
+                case OPERATION_DELETE :
+                    progressDialog.dismiss();
                     Toast.makeText(context,"Files successfully deleted",Toast.LENGTH_SHORT).show();
+                    refreshCurrentDirectory();
+                    break;
+
+                case OPERATION_POPULATE_LIST:
+                    adapter.notifyDataSetChanged();
                     break;
 
             }

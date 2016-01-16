@@ -1,10 +1,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+    xmlns:tools="http://schemas.android.com/tools" tools:context=".activities.MainActivity">
 
-    <item android:id="@+id/newFolder" android:title="@string/newFolder"
+    <item android:id="@+id/newFolder" android:title="@string/action_create_newFolder"
         android:showAsAction="never"/>
 
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
+    <item android:id="@+id/action_settings" android:title="@string/preferences"
         android:orderInCategory="100" app:showAsAction="never" />
 </menu>

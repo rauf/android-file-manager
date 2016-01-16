@@ -1,13 +1,52 @@
 <resources>
     <string name="app_name">"File Manager "</string>
     <string name="action_settings">Settings</string>
-    <string name="dialog.onlongpress.delete">Delete</string>
-    <string name="dialog.onlongpress.rename">Rename</string>
-    <string name="dialog.onlongpress.copy">Copy</string>
-    <string name="dialog.onlongpress.move">Move</string>
-    <string name="dialog.onlongpress.open">Open</string>
-    <string name="dialog.onlongpress.share">Share</string>
+    <string name="delete">Delete</string>
+    <string name="rename">Rename</string>
+    <string name="ok">OK</string>
+    <string name="copy">Copy</string>
+    <string name="move">Move</string>
+    <string name="open">Open</string>
+    <string name="share">Share</string>
+    <string name="create">Create</string>
     <string name="select">Select</string>
     <string name="cancel">Cancel</string>
-    <string name="newFolder">Create New Folder</string>
+    <string name="sorting">Sorting</string>
+    <string name="preferences">Preferences</string>
+    <string name="header1">Settings</string>
+
+    <!--- actions -->
+    <string name="action_create_newFolder">Create New Folder</string>
+    <string name="action_button_clicked">button clicked</string>
+
+
+    <!--- error messages -->
+    <string name="error_create_folder">Cannot create New Folder</string>
+    <string name="error_request_permission">You need to give access to External Storage</string>
+    <string name="error_rename">Cannot rename</string>
+
+
+    <!--- success messages -->
+    <string name="success_create_folder">Folder created successfully</string>
+    <string name="success_rename">Rename successful</string>
+
+
+    <!--- prompt user -->
+    <string name="prompt_create_folder">Enter name of new folder</string>
+    <string name="prompt_select_destination">Select a destination</string>
+    <string name="prompt_rename_newName">Type the new name</string>
+    <string name="prompt_show_hiddenFilers">Show hidden files</string>
+    <string name="prompt_sort_order">Sort order</string>
+    <string name="prompt_case_sensitivity">Case sensitivity</string>
+    <string name="prompt_select_one">Select one</string>
+
+
+    <!--- info. to user -->
+    <string name="info_items_selected">items selected</string>
+    <string name="info_options">Options</string>
+    <string name="info_sorting_option">Click to view preferences</string>
+    <string name="info_hiddenFiles_option">Show files starting with \' . \'</string>
+
+
+
 </resources>

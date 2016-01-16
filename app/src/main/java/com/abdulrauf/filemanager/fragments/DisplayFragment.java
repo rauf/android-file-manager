@@ -5,10 +5,12 @@ import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Parcel;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
@@ -40,6 +42,11 @@ import java.util.ArrayList;
 public class DisplayFragment extends Fragment  {
 
 
+    private final String PREF_IS_CASE_SENSITIVE = "isCaseSensitive";
+    private final String PREF_SHOW_HIDDEN_FILES = "showHiddenFiles";
+    private final String PREF_SORT_TYPE = "sortType";
+
+
     private RecyclerView recyclerView;
     private File path;
     private ArrayList<File> filesAndFolders;
@@ -48,7 +55,12 @@ public class DisplayFragment extends Fragment  {
     private DisplayFragmentAdapter adapter;
     private ActionMode actionMode;
     private DialogFragment longPressDialog;
+    private SharedPreferences prefs;
     private boolean clickAllowed;
+
+    private boolean isCaseSensitive;
+    private boolean showHiddenFiles;
+    private String sortType;
 
 
       @Override
@@ -84,13 +96,15 @@ public class DisplayFragment extends Fragment  {
 
         filesAndFolders = new ArrayList<>();
 
-
         adapter = new DisplayFragmentAdapter(filesAndFolders,onItemClickListenerCallback,getActivity());
         eventManager = new EventManager(getActivity(),this,filesAndFolders,adapter);
 
+        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        eventManager.getFileManager().setShowHiddenFiles(false);
-        eventManager.getFileManager().setSortingStyle(EventManager.SORT.ASC, false);
+        loadPrefs();
+
+        eventManager.getFileManager().setShowHiddenFiles(showHiddenFiles);
+        eventManager.getFileManager().setSortingStyle(sortType, isCaseSensitive);
 
         recyclerView.setLayoutManager(gridLayoutManager);
         eventManager.open(path);
@@ -102,6 +116,26 @@ public class DisplayFragment extends Fragment  {
     }
 
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        onPrefChange();
+    }
+
+    private void onPrefChange() {
+
+        loadPrefs();
+        eventManager.getFileManager().setShowHiddenFiles(showHiddenFiles);
+        eventManager.getFileManager().setSortingStyle(sortType, isCaseSensitive);
+        eventManager.populateList(eventManager.getFileManager().getCurrentDirectory());
+    }
+
+    private void loadPrefs() {
+
+        isCaseSensitive = prefs.getBoolean(PREF_IS_CASE_SENSITIVE,false);
+        sortType = prefs.getString(PREF_SORT_TYPE,"ASC");
+        showHiddenFiles = prefs.getBoolean(PREF_SHOW_HIDDEN_FILES,false);
+    }
 
     private DisplayFragmentAdapter.OnItemClickListener onItemClickListenerCallback = new DisplayFragmentAdapter.OnItemClickListener() {
 
@@ -118,7 +152,6 @@ public class DisplayFragment extends Fragment  {
         public void onItemLongClick(View view, int position) {
 
             if(clickAllowed) {
-                //longPressDialog = new OnLongPressDialog(onLongPressListenerCallback, position);
                 longPressDialog = OnLongPressDialog.newInstance(onLongPressListenerCallback,position);
                 longPressDialog.show(getFragmentManager(), "onLongPressDialog");
             }
@@ -132,7 +165,7 @@ public class DisplayFragment extends Fragment  {
             if (actionMode != null) {
 
                 adapter.toggleSelection(position);
-                actionMode.setTitle(adapter.getSelectedItemsCount() + " items selected");
+                actionMode.setTitle(adapter.getSelectedItemsCount() + "  " + getString(R.string.info_items_selected));
 
                 if (adapter.getSelectedItemsCount() <= 0)
                     actionMode.finish();
@@ -142,7 +175,7 @@ public class DisplayFragment extends Fragment  {
 
             actionMode = getActivity().startActionMode(actionModeCallback);
             adapter.toggleSelection(position);
-            actionMode.setTitle(adapter.getSelectedItemsCount() + " items selected");
+            actionMode.setTitle(adapter.getSelectedItemsCount() + "  " + getString(R.string.info_items_selected));
         }
     };
 
@@ -174,7 +207,6 @@ public class DisplayFragment extends Fragment  {
 
                 case R.id.deleteButton1 :
                     eventManager.delete(adapter.getSelectedItems());
-                    adapter.deleteSelectedItemsFromList();
                     mode.finish();
                     return true;
 
@@ -214,8 +246,6 @@ public class DisplayFragment extends Fragment  {
         @Override
         public void onShareButtonClicked(int position) {
 
-            //Toast.makeText(getActivity(), "share Button clicked", Toast.LENGTH_SHORT).show();
-
             ArrayList<File> files = new ArrayList<File>();
             files.add(filesAndFolders.get(position));
             eventManager.share(files);
@@ -227,8 +257,6 @@ public class DisplayFragment extends Fragment  {
             ArrayList<File> files = new ArrayList<>();
             files.add(filesAndFolders.get(position));
             eventManager.delete(files);
-            filesAndFolders.remove(position);
-            adapter.notifyDataSetChanged();
             longPressDialog.dismiss();
         }
 
@@ -245,7 +273,6 @@ public class DisplayFragment extends Fragment  {
             ArrayList<File> list = new ArrayList<>();
             list.add(filesAndFolders.get(position));
             selectTargetAndPerformOperation(list, R.id.copyButton1);
-            adapter.notifyDataSetChanged();
             longPressDialog.dismiss();
         }
 
@@ -255,7 +282,6 @@ public class DisplayFragment extends Fragment  {
             ArrayList<File> list = new ArrayList<>();
             list.add(filesAndFolders.get(position));
             selectTargetAndPerformOperation(list, R.id.moveButton1);
-            adapter.notifyDataSetChanged();
             longPressDialog.dismiss();
         }
 
@@ -273,7 +299,7 @@ public class DisplayFragment extends Fragment  {
 
     private void selectTargetAndPerformOperation(final ArrayList<File> list,final int id) {
 
-        Toast.makeText(getActivity(), "Select a destination", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), getString(R.string.prompt_select_destination), Toast.LENGTH_SHORT).show();
         toolbar.inflateMenu(R.menu.menu_copy_move);
 
         toolbar.findViewById(R.id.cancelButton).setOnClickListener(new View.OnClickListener() {
@@ -315,13 +341,8 @@ public class DisplayFragment extends Fragment  {
 
                 toolbar.inflateMenu(R.menu.menu_main);
 
-                for(File file: list) {
-                    filesAndFolders.add(file);
-                }
-                adapter.notifyDataSetChanged();
             }
         });
-
 
     }
 
@@ -332,21 +353,21 @@ public class DisplayFragment extends Fragment  {
         final EditText editText = new EditText(getActivity());
         editText.setText(file.getName());
 
-        builder.setMessage("Type the new name ")
+        builder.setMessage(getString(R.string.prompt_rename_newName))
                 .setView(editText)
-                .setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.rename), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
                         if(eventManager.getFileManager().renameFileTo(file,editText.getText().toString())) {
-                            Toast.makeText(getActivity(), "Rename successful", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), getString(R.string.success_rename), Toast.LENGTH_SHORT).show();
                             eventManager.populateList(eventManager.getFileManager().getCurrentDirectory());
                         }
-                        else Toast.makeText(getActivity(),"Cannot rename",Toast.LENGTH_SHORT).show();
+                        else Toast.makeText(getActivity(),getString(R.string.error_rename),Toast.LENGTH_SHORT).show();
 
                     }
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton( getString(R.string.cancel), null)
                 .create()
                 .show();
     }
