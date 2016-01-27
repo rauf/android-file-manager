@@ -22,9 +22,9 @@ public class FileManager {
 
     private Stack<File> pathStack;
     private boolean showHiddenFiles;
-    private String sortingType;
+    private String sortOrder;
+    private String sortBy;
     private boolean caseSensitive;
-
 
 
     public FileManager() {
@@ -45,10 +45,33 @@ public class FileManager {
     }
 
 
-    public void initialisePathStackWithAbsolutPath(String dir) {
+    /**
+     *
+     * This method initializes the path stack with total path of file upto root
+     * excluding the file itself as it will be done in EventManager open() method
+     *
+     * */
 
+    public void initialisePathStackWithAbsolutePath(boolean choice, File file) {
 
+        if(!choice)
+            return;
 
+        File dir = new File(String.valueOf(file));
+        ArrayList<File> temp = new ArrayList<>();
+        File root = new File("/");
+
+        while(!dir.equals(root)) {
+
+            dir = dir.getParentFile();
+            temp.add(dir);
+        }
+
+        Collections.reverse(temp);
+
+        for (int i = 0; i < temp.size(); i++) {
+            pathStack.push(temp.get(i));
+        }
     }
 
     public File getCurrentDirectory(){
@@ -171,28 +194,49 @@ public class FileManager {
 
     public ArrayList<File> sort(ArrayList<File> files) {
 
-        ArrayList<File> sortedFiles = new ArrayList<>();
+        switch (sortOrder) {
 
-        switch (sortingType) {
+            case EventManager.SORT_ORDER_ASC:
 
-            case EventManager.SORT_ASC :
-                sortedFiles = sortAscending(files);
-                break;
+                switch (sortBy) {
 
-            case EventManager.SORT_DESC:
-                sortedFiles = sortDescending(files);
-                break;
+                    case EventManager.SORT_BY_NAME:
+                        return sortByNameAscending(files);
+
+                    case EventManager.SORT_BY_SIZE:
+                        return sortBySizeAscending(files);
+
+                    default:
+                        return sortByNameAscending(files);
+
+                }
+
+            case EventManager.SORT_ORDER_DESC:
+
+                switch (sortBy) {
+
+                    case EventManager.SORT_BY_NAME:
+                        return sortByNameDescending(files);
+
+                    case EventManager.SORT_BY_SIZE:
+                        return sortBySizeDescending(files);
+
+                    default:
+                        return sortBySizeAscending(files);
+                }
+
+            case EventManager.SORT_ORDER_NONE:
+                return files;
 
             default:
-                return files;
+                return sortByNameAscending(files);
         }
 
-        return sortedFiles;
     }
 
 
 
-    public ArrayList<File> sortAscending (ArrayList<File> files) {
+    public ArrayList<File> sortByNameAscending (ArrayList<File> files) {
 
         if (caseSensitive) {
             Collections.sort(files, new Comparator<File>() {
@@ -214,7 +258,7 @@ public class FileManager {
     }
 
 
-    public ArrayList<File> sortDescending (ArrayList<File> files) {
+    public ArrayList<File> sortByNameDescending (ArrayList<File> files) {
 
         if (caseSensitive) {
             Collections.sort(files, new Comparator<File>() {
@@ -232,6 +276,46 @@ public class FileManager {
                 }
             });
         }
+        return files;
+    }
+
+    public ArrayList<File> sortBySizeAscending(ArrayList<File> files) {
+
+
+        Collections.sort(files, new Comparator<File>() {
+            @Override
+            public int compare(File lhs, File rhs) {
+                long diff = lhs.length() - rhs.length();
+
+                if(diff < 0)
+                    return -1;
+                else if (diff > 0)
+                    return 1;
+                else return 0;
+
+            }
+        });
+
+        return files;
+    }
+
+    public ArrayList<File> sortBySizeDescending(ArrayList<File> files) {
+
+        Collections.sort(files, new Comparator<File>() {
+            @Override
+            public int compare(File lhs, File rhs) {
+
+                long diff = rhs.length() - lhs.length();
+
+                if(diff < 0)
+                    return -1;
+                else if (diff > 0)
+                    return 1;
+                else return 0;
+
+            }
+        });
+
         return files;
     }
 
@@ -268,16 +352,10 @@ public class FileManager {
         return showHiddenFiles;
     }
 
-    public String getSortingType() {
-        return sortingType;
-    }
 
-    public void setSortingType(String sortingType) {
-        this.sortingType = sortingType;
-    }
-
-    public void setSortingStyle(String sortingType, boolean caseSensitive) {
-        this.sortingType = sortingType;
+    public void setSortingStyle(String sortOrder,String sortBy, boolean caseSensitive) {
+        this.sortOrder = sortOrder;
+        this.sortBy = sortBy;
         this.caseSensitive = caseSensitive;
     }
 

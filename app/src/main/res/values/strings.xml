@@ -14,6 +14,7 @@
     <string name="sorting">Sorting</string>
     <string name="preferences">Preferences</string>
     <string name="header1">Settings</string>
+    <string name="search">Search</string>
 
     <!--- actions -->
     <string name="action_create_newFolder">Create New Folder</string>
@@ -39,6 +40,7 @@
     <string name="prompt_sort_order">Sort order</string>
     <string name="prompt_case_sensitivity">Case sensitivity</string>
     <string name="prompt_select_one">Select one</string>
+    <string name="prompt_sort_by">Sort files by</string>
 
 
     <!--- info. to user -->
@@ -46,6 +48,7 @@
     <string name="info_options">Options</string>
     <string name="info_sorting_option">Click to view preferences</string>
     <string name="info_hiddenFiles_option">Show files starting with \' . \'</string>
+    <string name="info_search_view">Search files and folders</string>
 
 
 

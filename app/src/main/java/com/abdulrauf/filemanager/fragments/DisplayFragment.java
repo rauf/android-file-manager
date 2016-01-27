@@ -42,9 +42,10 @@ import java.util.ArrayList;
 public class DisplayFragment extends Fragment  {
 
 
-    private final String PREF_IS_CASE_SENSITIVE = "isCaseSensitive";
-    private final String PREF_SHOW_HIDDEN_FILES = "showHiddenFiles";
-    private final String PREF_SORT_TYPE = "sortType";
+    private final String PREF_IS_CASE_SENSITIVE = "IS_CASE_SENSITIVE";
+    private final String PREF_SHOW_HIDDEN_FILES = "SHOW_HIDDEN_FILES";
+    private final String PREF_SORT_ORDER = "SORT_ORDER";
+    private final String PREF_SORT_BY = "SORT_BY";
 
 
     private RecyclerView recyclerView;
@@ -57,10 +58,6 @@ public class DisplayFragment extends Fragment  {
     private DialogFragment longPressDialog;
     private SharedPreferences prefs;
     private boolean clickAllowed;
-
-    private boolean isCaseSensitive;
-    private boolean showHiddenFiles;
-    private String sortType;
 
 
       @Override
@@ -101,17 +98,14 @@ public class DisplayFragment extends Fragment  {
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        loadPrefs();
-
-        eventManager.getFileManager().setShowHiddenFiles(showHiddenFiles);
-        eventManager.getFileManager().setSortingStyle(sortType, isCaseSensitive);
+        setPrefs();
+        eventManager.getFileManager().initialisePathStackWithAbsolutePath(true,path);
 
         recyclerView.setLayoutManager(gridLayoutManager);
         eventManager.open(path);
         recyclerView.setAdapter(adapter);
 
         clickAllowed = true;
-
         return view;
     }
 
@@ -119,22 +113,21 @@ public class DisplayFragment extends Fragment  {
     @Override
     public void onResume() {
         super.onResume();
-        onPrefChange();
+        setPrefs();
+        eventManager.refreshCurrentDirectory();
     }
 
-    private void onPrefChange() {
+    private void setPrefs() {
 
-        loadPrefs();
-        eventManager.getFileManager().setShowHiddenFiles(showHiddenFiles);
-        eventManager.getFileManager().setSortingStyle(sortType, isCaseSensitive);
-        eventManager.populateList(eventManager.getFileManager().getCurrentDirectory());
-    }
+        eventManager.getFileManager().setShowHiddenFiles(
+                prefs.getBoolean(PREF_IS_CASE_SENSITIVE,false));
 
-    private void loadPrefs() {
+        eventManager.getFileManager().setSortingStyle(
+                prefs.getString(PREF_SORT_ORDER, EventManager.SORT_ORDER_ASC),
+                prefs.getString(PREF_SORT_BY, EventManager.SORT_BY_NAME),
+                prefs.getBoolean(PREF_SHOW_HIDDEN_FILES, false)
+        );
 
-        isCaseSensitive = prefs.getBoolean(PREF_IS_CASE_SENSITIVE,false);
-        sortType = prefs.getString(PREF_SORT_TYPE,"ASC");
-        showHiddenFiles = prefs.getBoolean(PREF_SHOW_HIDDEN_FILES,false);
     }
 
     private DisplayFragmentAdapter.OnItemClickListener onItemClickListenerCallback = new DisplayFragmentAdapter.OnItemClickListener() {

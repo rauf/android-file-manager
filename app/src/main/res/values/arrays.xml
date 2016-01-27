@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="sort">
-        <item>No ordering</item>
+    <string-array name="sort_order">
+        <item>None</item>
         <item>Ascending</item>
         <item>Descending</item>
     </string-array>
 
-    <string-array name="sort_codes">
+    <string-array name="sort_order_codes">
         <item>NONE</item>
         <item>ASC</item>
         <item>DESC</item>
     </string-array>
-    
-    
+
+    <string-array name="sort_by">
+        <item>Name</item>
+        <item>Size</item>
+    </string-array>
+
+    <string-array name="sort_by_codes">
+        <item>NAME</item>
+        <item>SIZE</item>
+    </string-array>
 </resources>

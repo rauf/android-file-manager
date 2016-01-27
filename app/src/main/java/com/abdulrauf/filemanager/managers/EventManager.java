@@ -1,21 +1,18 @@
 package com.abdulrauf.filemanager.managers;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.Context;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.content.FileProvider;
 import android.webkit.MimeTypeMap;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.abdulrauf.filemanager.adapters.DisplayFragmentAdapter;
@@ -26,7 +23,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static java.lang.String.*;
 
 
 /**
@@ -35,14 +31,17 @@ import static java.lang.String.*;
 public class EventManager {
 
 
-    public static final String SORT_ASC = "ASC";
-    public static final String SORT_DESC = "DESC";
+    public static final String SORT_ORDER_ASC = "ASC";
+    public static final String SORT_ORDER_DESC = "DESC";
+    public static final String SORT_ORDER_NONE = "NONE";
+
+    public static final String SORT_BY_NAME = "NAME";
+    public static final String SORT_BY_SIZE = "SIZE";
 
     public static final String OPERATION_DELETE = "DELETE";
     public static final String OPERATION_COPY = "COPY";
     public static final String OPERATION_MOVE = "MOVE";
     public static final String OPERATION_POPULATE_LIST = "POPULATE_LIST";
-
 
 
     private Context context;

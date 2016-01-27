@@ -96,6 +96,7 @@ public class DisplayFragmentAdapter extends RecyclerView.Adapter<DisplayFragment
         }
         else holder.cardView.setCardBackgroundColor(Color.parseColor("#FFFFFF"));
 
+        holder.itemView.setSelected(true);
 
     }
 

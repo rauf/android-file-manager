@@ -3,6 +3,8 @@ package com.abdulrauf.filemanager.activities;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,6 +18,7 @@ import android.view.MenuItem;
 import android.support.v7.widget.Toolbar;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.abdulrauf.filemanager.R;
@@ -133,6 +136,12 @@ public class MainActivity extends AppCompatActivity {
 
 
         switch (item.getItemId()) {
+
+
+            case R.id.searchView :
+                Toast.makeText(MainActivity.this,"search clicked",Toast.LENGTH_SHORT).show();
+                onSearchRequested();
+                return true;
 
             case R.id.newFolder:
                 createNewFolderInCurrDirectory();
