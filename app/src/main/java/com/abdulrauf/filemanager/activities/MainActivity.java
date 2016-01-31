@@ -8,21 +8,27 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.os.StrictMode;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v7.widget.Toolbar;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
+import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.abdulrauf.filemanager.R;
 import com.abdulrauf.filemanager.fragments.DisplayFragment;
+import com.abdulrauf.filemanager.managers.EventManager;
 import com.abdulrauf.filemanager.managers.FileManager;
 
 import java.io.File;
@@ -33,21 +39,21 @@ public class MainActivity extends AppCompatActivity {
 
     final String DISPLAY_FRAGMENT_TAG = "displayFragment";
 
-    RelativeLayout relativeLayout;
+    DrawerLayout drawerLayout;
+    ListView drawerListView;
     FragmentManager fm;
     Toolbar toolbar;
+    ActionBarDrawerToggle toggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.drawer);
 
-        relativeLayout = (RelativeLayout) findViewById(R.id.RelativeLayoutMain);
 
         requestForPermission();
-        fm = getFragmentManager();
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        init();
 
         StrictMode.setThreadPolicy(
                 new StrictMode.ThreadPolicy.Builder().detectAll()
@@ -65,6 +71,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onPostCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
+        super.onPostCreate(savedInstanceState, persistentState);
+        toggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        toggle.onConfigurationChanged(newConfig);
+    }
+
+
+    private void init() {
+
+        fm = getFragmentManager();
+
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        drawerListView = (ListView) findViewById(R.id.drawerListView);
+
+        toggle = new ActionBarDrawerToggle(MainActivity.this,
+                drawerLayout,
+                toolbar,
+                R.string.open,
+                R.string.cancel);
+
+        drawerLayout.setDrawerListener(toggle);
+        toggle.syncState();
+    }
 
     private void requestForPermission() {
 
@@ -107,18 +143,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 
-        DisplayFragment displayFragment = (DisplayFragment) fm.findFragmentByTag(DISPLAY_FRAGMENT_TAG);
+        if(drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawers();
+            return;
+        }
 
-        int count = displayFragment
-                .getEventManager()
+        int count = EventManager
+                .getInstance()
                 .getFileManager()
                 .getPathStackItemsCount();
 
         if (count == 1)
             super.onBackPressed();
 
-        else displayFragment
-                .getEventManager()
+        else EventManager
+                .getInstance()
                 .moveUpDirectory();
 
     }
@@ -128,11 +167,16 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        //configureSearchView(menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (toggle.onOptionsItemSelected(item)) {
+            return true;
+        }
 
 
         switch (item.getItemId()) {
@@ -159,13 +203,46 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+/*
+    private void configureSearchView(Menu menu) {
 
+        // Associate searchable configuration with the SearchView
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView =
+                (SearchView) menu.findItem(R.id.searchView).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+
+
+    }
+
+    protected SearchView.OnQueryTextListener searchViewListener = new SearchView.OnQueryTextListener() {
+        @Override
+        public boolean onQueryTextSubmit(String query) {
+            return false;
+        }
+
+        @Override
+        public boolean onQueryTextChange(String newText) {
+            return false;
+        }
+    };
+
+
+    protected SearchView.OnCloseListener searchViewCloseListener = new SearchView.OnCloseListener() {
+
+        @Override
+        public boolean onClose() {
+            return false;
+        }
+    };
+
+*/
     private void createNewFolderInCurrDirectory() {
 
-        final DisplayFragment displayFragment = (DisplayFragment) fm.findFragmentByTag(DISPLAY_FRAGMENT_TAG);
-
-        final FileManager fileManager = displayFragment
-                                    .getEventManager()
+        final FileManager fileManager = EventManager
+                                    .getInstance()
                                     .getFileManager();
 
         final File dir = fileManager.getCurrentDirectory();
@@ -182,7 +259,9 @@ public class MainActivity extends AppCompatActivity {
 
                         if(fileManager.newFolder(dir,editText.getText().toString())) {
                             Toast.makeText(MainActivity.this, getString(R.string.success_create_folder), Toast.LENGTH_SHORT).show();
-                            displayFragment.getEventManager().populateList(fileManager.getCurrentDirectory());
+                            EventManager
+                                    .getInstance()
+                                    .populateList(fileManager.getCurrentDirectory());
                         }
                         else Toast.makeText(MainActivity.this,getString(R.string.error_create_folder),Toast.LENGTH_SHORT).show();
                     }

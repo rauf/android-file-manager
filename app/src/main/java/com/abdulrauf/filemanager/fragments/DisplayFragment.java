@@ -52,7 +52,6 @@ public class DisplayFragment extends Fragment  {
     private File path;
     private ArrayList<File> filesAndFolders;
     private Toolbar toolbar;
-    private EventManager eventManager;
     private DisplayFragmentAdapter adapter;
     private ActionMode actionMode;
     private DialogFragment longPressDialog;
@@ -94,15 +93,15 @@ public class DisplayFragment extends Fragment  {
         filesAndFolders = new ArrayList<>();
 
         adapter = new DisplayFragmentAdapter(filesAndFolders,onItemClickListenerCallback,getActivity());
-        eventManager = new EventManager(getActivity(),this,filesAndFolders,adapter);
+        EventManager.getInstance().init(getActivity(), this, filesAndFolders, adapter);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         setPrefs();
-        eventManager.getFileManager().initialisePathStackWithAbsolutePath(true,path);
+        EventManager.getInstance().getFileManager().initialisePathStackWithAbsolutePath(true,path);
 
         recyclerView.setLayoutManager(gridLayoutManager);
-        eventManager.open(path);
+        EventManager.getInstance().open(path);
         recyclerView.setAdapter(adapter);
 
         clickAllowed = true;
@@ -114,19 +113,26 @@ public class DisplayFragment extends Fragment  {
     public void onResume() {
         super.onResume();
         setPrefs();
-        eventManager.refreshCurrentDirectory();
+        EventManager.getInstance().refreshCurrentDirectory();
     }
 
     private void setPrefs() {
 
-        eventManager.getFileManager().setShowHiddenFiles(
-                prefs.getBoolean(PREF_IS_CASE_SENSITIVE,false));
+        EventManager
+                .getInstance()
+                .getFileManager()
+                .setShowHiddenFiles(
+                        prefs.getBoolean(PREF_IS_CASE_SENSITIVE, false)
+                );
 
-        eventManager.getFileManager().setSortingStyle(
-                prefs.getString(PREF_SORT_ORDER, EventManager.SORT_ORDER_ASC),
-                prefs.getString(PREF_SORT_BY, EventManager.SORT_BY_NAME),
-                prefs.getBoolean(PREF_SHOW_HIDDEN_FILES, false)
-        );
+        EventManager
+                .getInstance()
+                .getFileManager()
+                .setSortingStyle(
+                    prefs.getString(PREF_SORT_ORDER, EventManager.SORT_ORDER_ASC),
+                    prefs.getString(PREF_SORT_BY, EventManager.SORT_BY_NAME),
+                    prefs.getBoolean(PREF_SHOW_HIDDEN_FILES, false)
+                );
 
     }
 
@@ -137,7 +143,7 @@ public class DisplayFragment extends Fragment  {
             File singleItem = filesAndFolders.get(position);
 
             if(clickAllowed)
-                eventManager.open(singleItem);
+                EventManager.getInstance().open(singleItem);
 
         }
 
@@ -199,7 +205,7 @@ public class DisplayFragment extends Fragment  {
                     return true;
 
                 case R.id.deleteButton1 :
-                    eventManager.delete(adapter.getSelectedItems());
+                    EventManager.getInstance().delete(adapter.getSelectedItems());
                     mode.finish();
                     return true;
 
@@ -232,7 +238,9 @@ public class DisplayFragment extends Fragment  {
         @Override
         public void onOpenButtonClicked(int position) {
 
-            eventManager.open(filesAndFolders.get(position));
+            EventManager
+                    .getInstance()
+                    .open(filesAndFolders.get(position));
             longPressDialog.dismiss();
         }
 
@@ -241,7 +249,7 @@ public class DisplayFragment extends Fragment  {
 
             ArrayList<File> files = new ArrayList<File>();
             files.add(filesAndFolders.get(position));
-            eventManager.share(files);
+            EventManager.getInstance().share(files);
             longPressDialog.dismiss();
         }
 
@@ -249,7 +257,7 @@ public class DisplayFragment extends Fragment  {
         public void onDeleteButtonClicked(int position) {
             ArrayList<File> files = new ArrayList<>();
             files.add(filesAndFolders.get(position));
-            eventManager.delete(files);
+            EventManager.getInstance().delete(files);
             longPressDialog.dismiss();
         }
 
@@ -312,18 +320,22 @@ public class DisplayFragment extends Fragment  {
 
             @Override
             public void onClick(View v) {
-                File target = eventManager
+                File target = EventManager.getInstance()
                         .getFileManager()
                         .getCurrentDirectory();
 
                 switch (id) {
 
                     case R.id.copyButton1:
-                        eventManager.copy(list,target);
+                        EventManager
+                                .getInstance()
+                                .copy(list, target);
                         break;
 
                     case R.id.moveButton1:
-                        eventManager.move(list,target);
+                        EventManager
+                                .getInstance()
+                                .move(list, target);
                         break;
                 }
 
@@ -352,9 +364,9 @@ public class DisplayFragment extends Fragment  {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        if(eventManager.getFileManager().renameFileTo(file,editText.getText().toString())) {
+                        if(EventManager.getInstance().getFileManager().renameFileTo(file,editText.getText().toString())) {
                             Toast.makeText(getActivity(), getString(R.string.success_rename), Toast.LENGTH_SHORT).show();
-                            eventManager.populateList(eventManager.getFileManager().getCurrentDirectory());
+                            EventManager.getInstance().populateList(EventManager.getInstance().getFileManager().getCurrentDirectory());
                         }
                         else Toast.makeText(getActivity(),getString(R.string.error_rename),Toast.LENGTH_SHORT).show();
 
@@ -370,7 +382,5 @@ public class DisplayFragment extends Fragment  {
         return toolbar;
     }
 
-    public EventManager getEventManager() {
-        return eventManager;
-    }
+
 }

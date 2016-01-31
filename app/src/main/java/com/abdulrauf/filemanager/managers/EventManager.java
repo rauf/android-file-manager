@@ -49,9 +49,21 @@ public class EventManager {
     private ArrayList<File> filesAndFolders;
     private DisplayFragmentAdapter adapter;
     private DisplayFragment displayFragment;
+    private static EventManager instance;
 
+    private EventManager() {
+        //left blank
+    }
 
-    public EventManager(Context context, DisplayFragment displayFragment, ArrayList<File> filesAndFolders, DisplayFragmentAdapter adapter){
+    public static synchronized EventManager getInstance() {
+
+        if(instance == null)
+            instance = new EventManager();
+
+        return instance;
+    }
+
+    public void init(Context context, DisplayFragment displayFragment, ArrayList<File> filesAndFolders, DisplayFragmentAdapter adapter){
 
         this.context = context;
         this.displayFragment = displayFragment;
